@@ -1,0 +1,45 @@
+.teacher-dashboard {
+  padding: 20px;
+}
+
+.teacher-dashboard h2 {
+  background-color: green;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+.create-quiz, .classrooms {
+  margin: 20px 0;
+}
+
+.create-quiz .question {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.create-quiz input, .create-quiz select {
+  display: block;
+  margin: 5px 0;
+  padding: 5px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.create-quiz button, .classrooms button {
+  padding: 5px 10px;
+  margin-right: 10px;
+  background-color: blue;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.classroom-card {
+  background-color: #e0e0e0;
+  padding: 10px;
+  margin: 10px 0;
+  max-width: 400px;
+  text-align: center;
+}

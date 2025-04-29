@@ -1,0 +1,2 @@
+src/backend/database/journal/WiredTigerPreplog.0000000001 filter=lfs diff=lfs merge=lfs -text
+src/backend/database/journal/WiredTigerLog.0000000001 filter=lfs diff=lfs merge=lfs -text
