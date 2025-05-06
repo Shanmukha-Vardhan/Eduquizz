@@ -1,119 +1,117 @@
-// src/frontend/src/pages/student/StudentDashboard.jsx
+// Eduquizz/src/frontend/src/pages/student/StudentDashboard.jsx
 
 import React, { useState, useEffect } from 'react';
-import '../../styles/StudentDashboard.css'; // Assuming you have this file and it's correctly styled
+import '../../styles/StudentDashboard.css';
 
 function StudentDashboard() {
   const [classrooms, setClassrooms] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [loadingClassrooms, setLoadingClassrooms] = useState(true);
   const [loadingQuizzes, setLoadingQuizzes] = useState(true);
-  const [error, setError] = useState(null); // For general errors or specific fetch errors
+  const [error, setError] = useState(null);
 
   console.log("StudentDashboard: Component rendering/re-rendering");
 
   useEffect(() => {
     console.log("StudentDashboard: useEffect triggered to fetch data.");
-    // Get the token from localStorage
     const token = localStorage.getItem('token');
 
     if (!token) {
       setError("Authentication token not found. Please log in again.");
       setLoadingClassrooms(false);
       setLoadingQuizzes(false);
-      // Optionally, you could redirect to login here if no token
-      // import { useNavigate } from 'react-router-dom';
-      // const navigate = useNavigate(); navigate('/login');
       return;
     }
 
-    // --- Fetch Classrooms ---
- // In src/pages/student/StudentDashboard.jsx
-const fetchClassrooms = async () => {
-  console.log("[FRONTEND LOG] Attempting to fetch classrooms...");
-  setLoadingClassrooms(true);
-  setError(null);
-  const token = localStorage.getItem('token'); // Make sure token is fetched here
-  if (!token) {
-    setError("Auth token not found in fetchClassrooms");
-    setLoadingClassrooms(false);
-    return;
-  }
+    const fetchClassrooms = async () => {
+      console.log("[FRONTEND LOG][StudentDashboard] Attempting to fetch classrooms...");
+      setLoadingClassrooms(true);
+      // setError(null); // Reset error before new fetch if desired, or manage combined errors
+      const currentToken = localStorage.getItem('token'); // Re-fetch token in case it changed (though unlikely here)
+      if (!currentToken) {
+        setError("Auth token not found in fetchClassrooms");
+        setLoadingClassrooms(false);
+        return;
+      }
 
-  try {
-    const response = await fetch('/api/classroom', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.log("[FRONTEND LOG] Fetch classrooms API response status:", response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text(); // Get error text if not ok
-      console.error("[FRONTEND LOG] Error fetching classrooms:", response.status, response.statusText, "Error body:", errorText);
-      setError(`Error fetching classrooms: ${response.statusText} - ${errorText.substring(0,100)}`);
-      setClassrooms([]);
-      return;
-    }
-
-    // Try to parse JSON directly
-    const data = await response.json();
-    console.log("[FRONTEND LOG] Fetched and parsed classrooms data:", data);
-    setClassrooms(Array.isArray(data) ? data : []);
-
-  } catch (err) {
-    // This catch block will now primarily catch network errors or if response.json() itself fails
-    console.error("[FRONTEND LOG] Network or JSON parsing error during fetchClassrooms:", err);
-    setError(`An error occurred: ${err.message}`);
-    setClassrooms([]);
-  } finally {
-    setLoadingClassrooms(false);
-  }
-};
-// Make similar focused changes to fetchQuizzes if you are testing that too
-
-    // --- Fetch Quizzes ---
-    const fetchQuizzes = async () => {
-      console.log("Attempting to fetch quizzes...");
-      setLoadingQuizzes(true);
-      // setError(null); // Clear previous errors for this fetch - or use separate error states
       try {
-        const response = await fetch('/api/quiz', {
+        // --- MODIFICATION: Use PLURAL path ---
+        const response = await fetch('/api/classrooms', { // WAS: /api/classroom
           headers: {
-            'Authorization': `Bearer ${token}`, // IMPORTANT: Send the token
+            'Authorization': `Bearer ${currentToken}`,
             'Content-Type': 'application/json',
           },
         });
 
-        console.log("Fetch quizzes API response status:", response.status);
+        console.log("[FRONTEND LOG][StudentDashboard] Fetch classrooms API response status:", response.status);
+
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Failed to fetch quizzes and couldn't parse error." }));
-          console.error("Error fetching quizzes:", response.status, response.statusText, errorData);
-          setError(prevError => `${prevError || ''} Error fetching quizzes: ${errorData.message || response.statusText}`);
+          const errorText = await response.text();
+          console.error("[FRONTEND LOG][StudentDashboard] Error fetching classrooms:", response.status, response.statusText, "Error body:", errorText);
+          // Accumulate errors or set specific errors
+          setError(prev => (prev ? prev + " | " : "") + `Error fetching classrooms: ${response.statusText} - ${errorText.substring(0,100)}`);
+          setClassrooms([]);
+          return; // Important to return here if you don't want to proceed
+        }
+
+        const data = await response.json();
+        console.log("[FRONTEND LOG][StudentDashboard] Fetched and parsed classrooms data:", data);
+        setClassrooms(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("[FRONTEND LOG][StudentDashboard] Network or JSON parsing error during fetchClassrooms:", err);
+        setError(prev => (prev ? prev + " | " : "") + `An error occurred fetching classrooms: ${err.message}`);
+        setClassrooms([]);
+      } finally {
+        setLoadingClassrooms(false);
+      }
+    };
+
+    const fetchQuizzes = async () => {
+      console.log("[FRONTEND LOG][StudentDashboard] Attempting to fetch quizzes...");
+      setLoadingQuizzes(true);
+      const currentToken = localStorage.getItem('token');
+      if (!currentToken) {
+        setError("Auth token not found in fetchQuizzes");
+        setLoadingQuizzes(false);
+        return;
+      }
+
+      try {
+        // --- MODIFICATION: Use PLURAL path ---
+        const response = await fetch('/api/quizzes', { // WAS: /api/quiz
+          headers: {
+            'Authorization': `Bearer ${currentToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log("[FRONTEND LOG][StudentDashboard] Fetch quizzes API response status:", response.status);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("[FRONTEND LOG][StudentDashboard] Error fetching quizzes:", response.status, response.statusText, "Error body:", errorText);
+          setError(prev => (prev ? prev + " | " : "") + `Error fetching quizzes: ${errorText.substring(0,100)}`);
           setQuizzes([]);
           return;
         }
 
         const data = await response.json();
-        console.log("Fetched quizzes data:", data);
+        console.log("[FRONTEND LOG][StudentDashboard] Fetched and parsed quizzes data:", data);
         setQuizzes(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Network or other error during fetchQuizzes:", err);
-        setError(prevError => `${prevError || ''} An error occurred: ${err.message}`);
+        console.error("[FRONTEND LOG][StudentDashboard] Network or JSON parsing error during fetchQuizzes:", err);
+        setError(prev => (prev ? prev + " | " : "") + `An error occurred fetching quizzes: ${err.message}`);
         setQuizzes([]);
       } finally {
         setLoadingQuizzes(false);
       }
     };
 
+    // Clear previous global error before fetching
+    setError(null);
     fetchClassrooms();
     fetchQuizzes();
 
-  }, []); // Empty dependency array means this runs once on mount
-
-  // --- Render Logic ---
+  }, []);
 
   if (error) {
     return (
@@ -135,19 +133,16 @@ const fetchClassrooms = async () => {
           <h2>My Classrooms</h2>
           {loadingClassrooms ? (
             <p>Loading classrooms...</p>
-          ) : (
+          ) : classrooms.length > 0 ? (
             <div className="classroom-list">
-              {classrooms.length > 0 ? (
-                classrooms.map((classroom, index) => (
-                  // Ensure classroom object has a unique 'id' or use index if names can repeat
-                  <div className="classroom-item" key={classroom.id || index}>
-                    {classroom.name || 'Unnamed Classroom'}
-                  </div>
-                ))
-              ) : (
-                <p>No classrooms available.</p>
-              )}
+              {classrooms.map((classroom) => ( // Use classroom._id for key
+                <div className="classroom-item" key={classroom._id}>
+                  {classroom.name || 'Unnamed Classroom'}
+                </div>
+              ))}
             </div>
+          ) : (
+            <p>No classrooms available.</p>
           )}
         </section>
 
@@ -155,22 +150,19 @@ const fetchClassrooms = async () => {
           <h2>Available Quizzes</h2>
           {loadingQuizzes ? (
             <p>Loading quizzes...</p>
-          ) : (
+          ) : quizzes.length > 0 ? (
             <ul className="quiz-list">
-              {quizzes.length > 0 ? (
-                quizzes.map((quiz, index) => (
-                  <li key={quiz.id || index}> {/* Ensure quiz object has a unique 'id' */}
-                    {quiz.name || 'Unnamed Quiz'}
-                    {/* You'll need to implement navigation to the quiz */}
-                    <button className="start-quiz-btn" onClick={() => alert(`Start quiz: ${quiz.name} (ID: ${quiz.id || 'N/A'})`)}>
-                      Start
-                    </button>
-                  </li>
-                ))
-              ) : (
-                <p>No quizzes available.</p>
-              )}
+              {quizzes.map((quiz) => ( // Use quiz._id for key
+                <li key={quiz._id}>
+                  {quiz.title || 'Unnamed Quiz'} {/* Assuming quiz has 'title' not 'name' */}
+                  <button className="start-quiz-btn" onClick={() => alert(`Start quiz: ${quiz.title} (ID: ${quiz._id})`)}>
+                    Start
+                  </button>
+                </li>
+              ))}
             </ul>
+          ) : (
+            <p>No quizzes available.</p>
           )}
         </section>
       </main>

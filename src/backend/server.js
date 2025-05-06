@@ -1,74 +1,65 @@
+// Eduquizz/src/backend/server.js
+
 // Load environment variables FIRST
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./db'); // Import the DB connection function
+const connectDB = require('./db');
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
-const classroomRoutes = require('./routes/classroomRoutes');
+const classroomRoutes = require('./routes/classroomRoutes'); // We still need this for other routes
 
-// --- Configuration ---
-const PORT = process.env.PORT || 3000; // Use environment variable or default to 3000
-
-// --- Initialize App ---
-console.log('Initializing Express app...');
+const PORT = process.env.PORT || 3000;
 const app = express();
 
-// --- Connect to Database ---
-console.log('Attempting to connect to MongoDB...');
-connectDB(); // Call the function to establish DB connection
+connectDB();
+app.use(cors());
+app.use(express.json());
 
-// --- Core Middleware ---
-console.log('Applying CORS middleware...');
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-
-console.log('Applying JSON body parser middleware...');
-app.use(express.json()); // Parse incoming JSON request bodies
-
-console.log('Applying Global Request Logger middleware...');
-// This will log EVERY request that hits the Express application
 app.use((req, res, next) => {
   console.log(`****** GLOBAL LOGGER: Received ${req.method} request for ${req.originalUrl} ******`);
-  // Optional: Log headers if needed for debugging specific issues
-  // console.log('Request Headers:', req.headers);
-  next(); // Pass control to the next middleware/route
+  next();
 });
 
 // --- API Routes ---
 console.log('Mounting API routes...');
-app.use('/api/auth', authRoutes);       // Mount authentication routes
+app.use('/api/auth', authRoutes);
 console.log('--> Auth routes mounted successfully on /api/auth');
-app.use('/api/quizzes', quizRoutes);       // Mount quiz routes
-console.log('--> Quiz routes mounted successfully on /api/quiz');
-app.use('/api/classrooms', classroomRoutes); // Mount classroom routes
-console.log('--> Classroom routes mounted successfully on /api/classroom');
 
-// --- Root/Test Route (Optional) ---
-app.get('/', (req, res) => {
-    res.send('EduQuiz Backend API is running!');
+// --- TEMPORARY TEST ROUTE FOR /api/classrooms ---
+// This MUST be defined BEFORE the general classroomRoutes if it uses the same base path.
+// However, for testing, let's make it very specific.
+app.get('/api/classrooms/test-direct', (req, res) => {
+  console.log('****** HIT DIRECT TEST ROUTE: /api/classrooms/test-direct ******');
+  res.json({ message: "Direct test route for /api/classrooms/test-direct was hit!" });
 });
 
-// --- Global Error Handlers (Good Practice) ---
+// --- REGULAR ROUTE MOUNTING ---
+app.use('/api/quizzes', quizRoutes);
+console.log('--> Quiz routes mounted successfully on /api/quizzes');
+
+app.use('/api/classrooms', classroomRoutes); // This is where your router should handle /api/classrooms/ and /api/classrooms/create
+console.log('--> Classroom routes (router) mounted successfully on /api/classrooms');
+
+
+app.get('/', (req, res) => {
+  res.send('EduQuiz Backend API is running!');
+});
+
+// ... (error handlers and app.listen remain the same) ...
 process.on('unhandledRejection', (reason, promise) => {
   console.error('****** UNHANDLED REJECTION ******');
   console.error('Reason:', reason);
-  // Avoid logging the whole promise object unless necessary, can be large
-  // console.error('Promise:', promise);
 });
 
 process.on('uncaughtException', (error) => {
   console.error('****** UNCAUGHT EXCEPTION ******');
   console.error('Error:', error);
   console.error('!!! Server is likely in an unstable state. Exiting...');
-  // It's often recommended to exit gracefully after an uncaught exception
-  // as the application state might be corrupt. Use process manager like PM2
-  // in production to automatically restart.
   process.exit(1);
 });
 
-// --- Start Server ---
-console.log('Starting server listener...');
 app.listen(PORT, () => {
   console.log(`****** Server is LIVE and listening on http://localhost:${PORT} ******`);
 });
