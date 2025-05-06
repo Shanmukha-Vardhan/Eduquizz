@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
         }
 
         // Create new user (password will be hashed by User schema's pre-save hook)
-        const user = new User({ name, email, password_hash: password, role });
+        const user = new User({ name, email, password: password, role });
         await user.save();
 
         // Generate JWT
@@ -34,18 +34,18 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user
+        // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
             console.log('User not found for email:', email);
-            return res.status(400).json({ error: 'Invalid credentials' });
+            return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // Check password
-        const isMatch = await bcrypt.compare(password, user.password_hash);
+        // Compare password using bcrypt
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             console.log('Password mismatch for email:', email);
-            return res.status(400).json({ error: 'Invalid credentials' });
+            return res.status(400).json({ error: 'Invalid email or password' });
         }
 
         // Generate JWT
@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
         // Log the role for debugging
         console.log('User role:', user.role);
 
-        // Return token and role directly
+        // Return token and role
         res.json({ token, role: user.role.toLowerCase() });
     } catch (error) {
         console.error('Login error:', error);

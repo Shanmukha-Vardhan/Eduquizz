@@ -7,6 +7,17 @@
     border-radius: 5px;
   }
   
+
+  .error-toast {
+    background-color: #ffdddd;
+    padding: 10px;
+    color: #d8000c;
+    border: 1px solid #d8000c;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
   .login-container h2 {
     text-align: center;
   }

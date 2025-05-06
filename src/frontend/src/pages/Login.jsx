@@ -1,70 +1,102 @@
+// src/frontend/src/pages/Login.jsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
-function Login({ setAuth, setRole }) {
+// --- MODIFICATION: Accept setAuth and setRole as props ---
+const Login = ({ setAuth, setRole }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    console.log('Attempting login with:', { email, password });
 
     try {
       const response = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, password }),
       });
 
-      console.log('Response status:', response.status);
-      if (!response.ok) throw new Error('Login failed');
-
       const data = await response.json();
-      console.log('Response data:', data);
-      const { role } = data;
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', role);
-      setAuth(true); // Update App.jsx state
-      setRole(role); // Update App.jsx state
-      console.log('Navigating to:', role === 'admin' ? '/admin' : role === 'teacher' ? '/teacher' : role === 'student' ? '/student' : '/');
 
-      if (role === 'admin') navigate('/admin');
-      else if (role === 'teacher') navigate('/teacher');
-      else if (role === 'student') navigate('/student');
-      else navigate('/');
+      if (!response.ok) {
+        setError(data.message || 'Invalid email or password');
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.role);
+
+      // --- MODIFICATION: Directly update App.jsx state BEFORE navigating ---
+      if (typeof setAuth === 'function') {
+        console.log("Login.jsx: Calling setAuth(true)");
+        setAuth(true);
+      }
+      if (typeof setRole === 'function') {
+        console.log("Login.jsx: Calling setRole with:", data.role);
+        setRole(data.role);
+      }
+      // --- End of Modification ---
+
+      // Navigation paths should be correct from previous fixes
+      if (data.role === 'teacher') {
+        console.log('Login.jsx: Navigating to /teacher');
+        navigate('/teacher');
+      } else if (data.role === 'student') {
+        console.log('Login.jsx: Navigating to /student');
+        navigate('/student');
+      } else if (data.role === 'admin') {
+        console.log('Login.jsx: Navigating to /admin');
+        navigate('/admin');
+      } else {
+        setError('Unknown role');
+      }
     } catch (err) {
-      console.error('Error:', err.message);
-      setError('Invalid email or password');
+      console.error('Login API call failed:', err);
+      setError('Something went wrong during login. Please check console or try again.');
     }
   };
 
   return (
     <div className="login-container">
       <h2>Login</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
+      {error && <div className="error-toast">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+          />
+        </div>
+        <button type="submit" className="login-button">Login</button>
       </form>
     </div>
   );
-}
+};
 
 export default Login;

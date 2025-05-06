@@ -25,13 +25,15 @@ exports.createClassroom = async (req, res) => {
   }
 };
 
+// In controllers/classroomController.js
 exports.getClassrooms = async (req, res) => {
   try {
-    console.log('Fetching classrooms for user:', req.user);
+    console.log('[BACKEND LOG] getClassrooms: req.user is:', req.user); // Log 1
     const classrooms = await Classroom.find({ teacher: req.user.id }).populate('students');
+    console.log('[BACKEND LOG] getClassrooms: Classrooms found by query:', classrooms); // Log 2 (ADD THIS LINE)
     res.json(classrooms);
   } catch (error) {
-    console.error('Error fetching classrooms:', error.message);
+    console.error('[BACKEND LOG] getClassrooms: Error fetching classrooms:', error.message, error.stack); // Add error.stack
     res.status(500).json({ error: 'Server error' });
   }
 };

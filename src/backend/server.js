@@ -39,9 +39,9 @@ app.use((req, res, next) => {
 console.log('Mounting API routes...');
 app.use('/api/auth', authRoutes);       // Mount authentication routes
 console.log('--> Auth routes mounted successfully on /api/auth');
-app.use('/api/quiz', quizRoutes);       // Mount quiz routes
+app.use('/api/quizzes', quizRoutes);       // Mount quiz routes
 console.log('--> Quiz routes mounted successfully on /api/quiz');
-app.use('/api/classroom', classroomRoutes); // Mount classroom routes
+app.use('/api/classrooms', classroomRoutes); // Mount classroom routes
 console.log('--> Classroom routes mounted successfully on /api/classroom');
 
 // --- Root/Test Route (Optional) ---
