@@ -10,14 +10,13 @@ const router = express.Router();
 // GET all quizzes for the student's/teacher's relevant classrooms
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    // --- MODIFICATION: Use req.user.id ---
-    if (!req.user || !req.user.id || !req.user.role) { // Check for req.user.id and req.user.role
+    if (!req.user || !req.user.id || !req.user.role) {
         console.log('[quizRoutes] GET /: Unauthorized - User ID or role not found');
+        // --- ADD return ---
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const currentUserId = req.user.id; // Use req.user.id
+    const currentUserId = req.user.id;
     const currentUserRole = req.user.role;
-    // --- END MODIFICATION ---
     console.log('[quizRoutes] GET /: Fetching quizzes for user:', currentUserId, "Role:", currentUserRole);
 
     let quizzes = [];
@@ -30,40 +29,49 @@ router.get('/', authMiddleware, async (req, res) => {
             console.log('[quizRoutes] GET /: Quizzes for student found:', quizzes.length);
         }
     } else if (currentUserRole === 'teacher') {
-        // For a teacher, find quizzes they created OR quizzes in their classrooms
-        // Example: Quizzes in classrooms they teach
         const teacherClassrooms = await Classroom.find({ teacher: currentUserId });
         if (teacherClassrooms.length > 0) {
             const classroomIds = teacherClassrooms.map(c => c._id);
             quizzes = await Quiz.find({ classroom: { $in: classroomIds } }).populate('classroom', 'name').populate('createdBy', 'name email');
         }
-        // Alternatively, or in addition, quizzes they created directly:
-        // const createdQuizzes = await Quiz.find({ createdBy: currentUserId });
-        // quizzes = quizzes.concat(createdQuizzes); // (Handle potential duplicates if needed)
         console.log('[quizRoutes] GET /: Quizzes for teacher found:', quizzes.length);
     }
 
     res.json(quizzes);
+    // --- ADD return ---
+    return; // Explicitly stop execution after sending success response
+
   } catch (error) {
     console.error('[quizRoutes] GET /: Error fetching quizzes:', error.message, error.stack);
-    res.status(500).json({ error: 'Server error while fetching quizzes' });
+    // --- ADD return ---
+    // Ensure we don't try to send another response if headers were somehow already sent before the error
+    if (!res.headersSent) {
+        res.status(500).json({ error: 'Server error while fetching quizzes' });
+    }
+    return; // Stop execution after sending error response
   }
 });
 
 // POST create a new quiz
-router.post('/create', authMiddleware, quizController.createQuiz); // This should use req.user.id inside quizController.createQuiz
+router.post('/create', authMiddleware, quizController.createQuiz);
 
 // GET a specific quiz by ID
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
     const quiz = await Quiz.findById(req.params.id).populate('classroom', 'name').populate('createdBy', 'name email');
     if (!quiz) {
+      // --- ADD return ---
       return res.status(404).json({ error: 'Quiz not found' });
     }
     res.json(quiz);
+    // --- ADD return ---
+    return;
   } catch (error) {
     console.error('[quizRoutes] GET /:id : Error fetching quiz:', error.message, error.stack);
-    res.status(500).json({ error: 'Server error' });
+     if (!res.headersSent) {
+        res.status(500).json({ error: 'Server error' });
+     }
+     return;
   }
 });
 
@@ -71,11 +79,16 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.post('/:id/submit', authMiddleware, async (req, res) => {
   try {
     const { answers } = req.body;
-    console.log('Quiz submission:', { quizId: req.params.id, answers, studentId: req.user.id }); // Use req.user.id
+    console.log('Quiz submission:', { quizId: req.params.id, answers, studentId: req.user.id });
     res.json({ message: 'Quiz submitted successfully' });
+    // --- ADD return ---
+    return;
   } catch (error) {
     console.error('Error submitting quiz:', error.message);
-    res.status(500).json({ error: 'Server error' });
+     if (!res.headersSent) {
+        res.status(500).json({ error: 'Server error' });
+     }
+     return;
   }
 });
 

@@ -255,6 +255,10 @@ function AdminDashboard() {
 
   const closeModal = () => { setShowModal(false); setModalMessage(''); };
 
+  console.log('[AdminDashboard Render] isLoadingClassrooms:', isLoadingClassrooms);
+  console.log('[AdminDashboard Render] classroomError:', classroomError);
+  console.log('[AdminDashboard Render] classrooms state:', JSON.stringify(classrooms, null, 2)); // Log the actual array
+
   return (
     <div className="admin-dashboard-container">
       <header className="dashboard-header"><h1>Admin Dashboard</h1></header>
