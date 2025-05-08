@@ -12,7 +12,7 @@ const Quiz = () => {
     const fetchQuiz = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:3000/api/quiz/${quizId}`, {
+        const res = await axios.get(`http://localhost:3000/api/quizzes/${quizId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Fetched quiz:', res.data);
@@ -33,7 +33,7 @@ const Quiz = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        `http://localhost:3000/api/quiz/${quizId}/submit`,
+        `http://localhost:3000/api/quizzes/${quizId}/submit`,
         { answers },
         { headers: { Authorization: `Bearer ${token}` } }
       );

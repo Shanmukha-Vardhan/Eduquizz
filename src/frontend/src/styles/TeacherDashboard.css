@@ -162,3 +162,112 @@
   .modal-content button {
       padding: 8px 20px;
   }
+
+  /* In TeacherDashboard.css - Add these or adapt existing modal styles */
+
+.modal-backdrop.results-modal-backdrop { /* If you want specific backdrop styling */
+    /* background-color: rgba(0, 0, 0, 0.6); */
+}
+
+.modal-content.results-modal-content {
+    width: 80%; /* Make results modal wider */
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto; /* Scroll if content is too long */
+}
+
+.results-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.results-table th,
+.results-table td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.results-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.modal-close-btn {
+    margin-top: 20px;
+    float: right; /* Or use flexbox on a parent */
+}
+
+/* Quiz List Item Styling */
+.quiz-list .quiz-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.quiz-list .quiz-item:last-child {
+    border-bottom: none;
+}
+
+.quiz-details {
+    flex-grow: 1;
+}
+.quiz-details strong {
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 3px;
+}
+.quiz-details small {
+    display: block;
+    color: #555;
+    font-size: 0.85em;
+}
+
+.quiz-item-actions button {
+    margin-left: 10px;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+.btn-small {
+    padding: 5px 10px;
+    font-size: 0.85em;
+}
+
+/* In TeacherDashboard.css - Add these or adapt existing modal styles */
+.confirm-delete-modal-content p {
+    margin-bottom: 10px;
+}
+.confirm-delete-modal-content p small {
+    color: #555;
+    display: block;
+    margin-top: 5px;
+}
+.confirm-delete-modal-content .modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+}
+.confirm-delete-modal-content .modal-actions button {
+    margin-left: 10px;
+}
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}

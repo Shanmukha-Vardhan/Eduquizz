@@ -6,7 +6,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import StudentDashboard from './pages/student/StudentDashboard'; // Ensure this path is correct
 import Login from './pages/Login';
-import Quiz from './components/Quiz';
+import QuizAttempt from './pages/student/QuizAttempt'; // New import
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -157,13 +157,13 @@ function App() {
 
                   {/* Quiz Route */}
                   <Route
-                    path="/quiz/:quizId"
-                    element={
-                      <ProtectedRoute> {/* Allow any authenticated user */}
-                        <Quiz />
-                      </ProtectedRoute>
-                    }
-                  />
+  path="/quiz/:quizId"
+  element={
+    <ProtectedRoute> {/* Allow any authenticated user for now */}
+      <QuizAttempt />
+    </ProtectedRoute>
+  }
+/>
 
                   {/* Catch-all 404 */}
                   <Route path="*" element={<p>Page Not Found (404) - from catch-all</p>} />

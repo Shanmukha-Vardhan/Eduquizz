@@ -9,7 +9,8 @@ const connectDB = require('./db'); // Import the DB connection function
 const authRoutes = require('./routes/authRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const classroomRoutes = require('./routes/classroomRoutes');
-const userRoutes = require('./routes/userRoutes'); // <-- IMPORT USER ROUTES
+const userRoutes = require('./routes/userRoutes');
+const submissionRoutes = require('./routes/submissionRoutes'); // <<<--- IMPORT SUBMISSION ROUTES
 
 // --- Configuration ---
 const PORT = process.env.PORT || 3000; // Use environment variable or default to 3000
@@ -53,8 +54,12 @@ app.use('/api/classrooms', classroomRoutes);
 console.log('--> Classroom routes mounted successfully on /api/classrooms');
 
 // User routes (for admin fetching user lists, etc.) (plural)
-app.use('/api/users', userRoutes); // <-- MOUNT USER ROUTES
+app.use('/api/users', userRoutes);
 console.log('--> User routes mounted successfully on /api/users');
+
+// Submission routes (plural)
+app.use('/api/submissions', submissionRoutes); // <<<--- MOUNT SUBMISSION ROUTES
+console.log('--> Submission routes mounted successfully on /api/submissions');
 
 
 // --- Root/Test Route (Optional) ---
@@ -79,7 +84,7 @@ process.on('uncaughtException', (error) => {
   // It's often recommended to exit gracefully after an uncaught exception
   // as the application state might be corrupt. Use process manager like PM2
   // in production to automatically restart.
-  process.exit(1);
+  process.exit(1); // Consider if this is appropriate for your dev environment
 });
 
 // --- Start Server ---

@@ -71,3 +71,64 @@
       margin-top: 0.5rem;
     }
   }
+
+  /* In StudentDashboard.css */
+.student-main .card {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.quiz-list .quiz-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+.quiz-list .quiz-item:last-child {
+  border-bottom: none;
+}
+.quiz-info {
+  flex-grow: 1;
+}
+.quiz-classroom-info {
+  font-size: 0.9em;
+  color: #555;
+  margin-left: 5px;
+}
+.attempted-badge {
+  background-color: #6c757d; /* Secondary color */
+  color: white;
+  font-size: 0.75em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+.start-quiz-btn { /* General button styling if not already global */
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-secondary { background-color: #6c757d; color: white; }
+
+
+.submissions-history h2 { margin-bottom: 15px; }
+.submissions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.submissions-table th, .submissions-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.submissions-table th {
+  background-color: #f2f2f2;
+}
