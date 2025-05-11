@@ -7,7 +7,7 @@ function TeacherDashboard() {
   // --- State ---
   const [assignedClassrooms, setAssignedClassrooms] = useState([]);
   const [isLoadingClassrooms, setIsLoadingClassrooms] = useState(true);
-  const [classroomError, setClassroomError] = useState(null); // Keep for classroom fetch errors
+  const [classroomError, setClassroomError] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [isLoadingQuizzes, setIsLoadingQuizzes] = useState(true);
   const [quizListError, setQuizListError] = useState(null);
@@ -26,6 +26,9 @@ function TeacherDashboard() {
   });
   const [isEditingQuiz, setIsEditingQuiz] = useState(false);
   const [quizFormError, setQuizFormError] = useState(null);
+
+  // --- NEW STATE FOR REATTEMPT PROCESSING ---
+  const [isProcessingReattempt, setIsProcessingReattempt] = useState(null);
 
 
   // --- Fetch Data ---
@@ -76,7 +79,6 @@ function TeacherDashboard() {
   };
 
   const handleQuestionFormChange = (index, field, value) => {
-     // Log changes specifically for correctAnswer
      if (field === 'correctAnswer') {
         console.log(`[handleQuestionFormChange] Updating Question ${index + 1}, correctAnswer to: "${value}"`);
      }
@@ -108,54 +110,30 @@ function TeacherDashboard() {
     setIsEditingQuiz(false); setQuizFormError(null);
   };
 
-  // --- Submit Quiz (Create or Update) with Detailed Validation Logging ---
   const handleSubmitQuizForm = async (e) => {
     e.preventDefault(); setQuizFormError(null);
     console.log("[handleSubmitQuizForm] Form state on submit:", JSON.stringify(quizForm, null, 2));
-
     if (!quizForm.classroom) { setGeneralModalMessage("Please select a classroom."); setShowGeneralModal(true); return; }
     if (!quizForm.title.trim()) { setGeneralModalMessage("Please enter a quiz title."); setShowGeneralModal(true); return; }
-
-    // Detailed Question Validation Logging
     let validationFailed = false;
     for (let index = 0; index < quizForm.questions.length; index++) {
         const q = quizForm.questions[index];
-        console.log(`[Validation] Checking Question ${index + 1}:`, q);
-        const hasText = q.questionText?.trim();
-        const hasAnswer = q.correctAnswer?.trim();
+        const hasText = q.questionText?.trim(); const hasAnswer = q.correctAnswer?.trim();
         const hasOptionsArray = Array.isArray(q.options);
         const nonEmptyOptions = hasOptionsArray ? q.options.filter(opt => opt?.trim()) : [];
         const hasAtLeastOneOption = nonEmptyOptions.length > 0;
-
-        console.log(`  - hasText: ${!!hasText}, hasAnswer: ${!!hasAnswer}, hasOptionsArray: ${hasOptionsArray}, hasAtLeastOneOption: ${hasAtLeastOneOption}`);
-
         if (!hasText || !hasAnswer || !hasOptionsArray || !hasAtLeastOneOption) {
-            console.error(`[Validation] FAILED basic structure check for Question ${index + 1}`);
             setGeneralModalMessage(`Ensure Question ${index + 1} fields, at least one non-empty option, and the correct answer are filled.`);
-            setShowGeneralModal(true);
-            validationFailed = true;
-            break; // Exit loop on first failure
+            setShowGeneralModal(true); validationFailed = true; break;
         }
-
         const validOptions = q.options.map(opt => opt.trim()).filter(opt => opt);
         const answerMatchesOption = validOptions.includes(q.correctAnswer.trim());
-        console.log(`  - Correct Answer: "${q.correctAnswer?.trim()}", Valid Options: ${JSON.stringify(validOptions)}, Matches Option: ${answerMatchesOption}`);
-
         if (!answerMatchesOption) {
-            console.error(`[Validation] FAILED answer match check for Question ${index + 1}`);
             setGeneralModalMessage(`Correct answer for Question ${index + 1} ("${q.correctAnswer}") must match one of the non-empty options provided.`);
-            setShowGeneralModal(true);
-            validationFailed = true;
-            break; // Exit loop on first failure
+            setShowGeneralModal(true); validationFailed = true; break;
         }
-    } // End of for loop
-
-    if (validationFailed) {
-        console.log("[handleSubmitQuizForm] Validation failed. Aborting submit.");
-        return; // Stop submission if validation failed
     }
-
-    // --- If validation passes, proceed with submission ---
+    if (validationFailed) { console.log("[handleSubmitQuizForm] Validation failed. Aborting submit."); return; }
     console.log("[handleSubmitQuizForm] Validation passed. Proceeding with API call.");
     const token = localStorage.getItem('token');
     const quizPayload = {
@@ -169,60 +147,47 @@ function TeacherDashboard() {
     try {
       let response;
       if (isEditingQuiz && quizForm._id) {
-        console.log("[TeacherDashboard] Updating quiz:", quizForm._id, quizPayload);
         response = await axios.put(`/api/quizzes/${quizForm._id}`, quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
         setGeneralModalMessage("Quiz updated successfully!");
       } else {
-        console.log("[TeacherDashboard] Creating new quiz:", quizPayload);
         response = await axios.post('/api/quizzes/create', quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
         setGeneralModalMessage("Quiz created successfully!");
       }
-      console.log("[TeacherDashboard] Create/Update Response:", response.data);
       setShowGeneralModal(true); resetQuizForm(); fetchTeacherQuizzes();
     } catch (err) {
-      console.error("[TeacherDashboard] Error submitting quiz form:", err);
       const errorMsg = err.response?.data?.error || err.message || (isEditingQuiz ? "Failed to update quiz." : "Failed to create quiz.");
       setQuizFormError(errorMsg); setGeneralModalMessage(`Error: ${errorMsg}`); setShowGeneralModal(true);
     }
   };
 
-  // --- Start Editing Quiz ---
   const handleStartEditQuiz = (quizToEdit) => {
-    console.log("[TeacherDashboard] Starting to edit quiz:", quizToEdit);
     setIsEditingQuiz(true);
     setQuizForm({
         _id: quizToEdit._id, title: quizToEdit.title,
         classroom: quizToEdit.classroom?._id || quizToEdit.classroom,
         questions: quizToEdit.questions.map(q => ({
             _id: q._id, questionText: q.text,
-            options: [...(q.options || []), '', '', '', ''].slice(0, 4),
+            options: [...(q.options || []), '', '', '', ''].slice(0, 4), // Ensure 4 options, preserving existing
             correctAnswer: q.answer
         }))
     });
     setQuizFormError(null);
-    const formElement = document.getElementById('quiz-form-section');
-    if (formElement) formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('quiz-form-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // --- Functions for Viewing Quiz Results (CORRECTED) ---
   const handleViewResults = async (quizToView) => {
-    console.log("[TeacherDashboard] Viewing results for quiz:", quizToView.title, quizToView._id);
-    setSelectedQuizForResults(quizToView); // CORRECTED: Use quizToView
-    setIsLoadingSubmissions(true);
+    setSelectedQuizForResults(quizToView); setIsLoadingSubmissions(true);
     setSubmissionError(null); setQuizSubmissions([]); setShowResultsModal(true);
     const token = localStorage.getItem('token');
     if (!token) { setSubmissionError("Auth token missing."); setIsLoadingSubmissions(false); return; }
     try {
         const response = await axios.get(`/api/submissions/quiz/${quizToView._id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-        console.log("[TeacherDashboard] Fetched submissions for quiz:", response.data);
         setQuizSubmissions(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
-        console.error("[TeacherDashboard] Error fetching submissions:", err);
         setSubmissionError(err.response?.data?.error || err.message || "Failed to fetch submissions.");
     } finally { setIsLoadingSubmissions(false); }
   };
 
-  // --- Functions for Deleting Quiz ---
   const openDeleteConfirmModal = (quiz) => { setQuizToDelete(quiz); setShowConfirmDeleteModal(true); };
   const closeDeleteConfirmModal = () => { setQuizToDelete(null); setShowConfirmDeleteModal(false); };
   const handleDeleteQuiz = async () => {
@@ -234,12 +199,44 @@ function TeacherDashboard() {
         setGeneralModalMessage(`Quiz "${quizToDelete.title}" deleted.`); setShowGeneralModal(true);
         fetchTeacherQuizzes();
     } catch (err) {
-        const errorMsg = err.response?.data?.error || err.message || "Failed to delete quiz.";
-        setGeneralModalMessage(`Error: ${errorMsg}`); setShowGeneralModal(true);
+        setGeneralModalMessage(`Error: ${err.response?.data?.error || err.message || "Failed to delete quiz."}`); setShowGeneralModal(true);
     } finally { closeDeleteConfirmModal(); }
   };
 
-  // --- Modal Closing & Formatting ---
+  // --- NEW: Function to Handle Allowing Reattempt (Deleting a Submission) ---
+  const handleAllowReattempt = async (submissionId, studentName) => {
+    if (!window.confirm(`Are you sure you want to delete ${studentName}'s attempt? This will allow them to reattempt the quiz.`)) {
+        return;
+    }
+    setIsProcessingReattempt(submissionId);
+    const token = localStorage.getItem('token');
+    if (!token) {
+        setGeneralModalMessage("Authentication error. Please log in again.");
+        setShowGeneralModal(true);
+        setIsProcessingReattempt(null);
+        return;
+    }
+    try {
+        await axios.delete(`/api/submissions/${submissionId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setGeneralModalMessage(`${studentName}'s attempt deleted. They can now reattempt the quiz.`);
+        setShowGeneralModal(true);
+        if (selectedQuizForResults) { // Refresh results in modal
+            const response = await axios.get(`/api/submissions/quiz/${selectedQuizForResults._id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setQuizSubmissions(Array.isArray(response.data) ? response.data : []);
+        }
+    } catch (err) {
+        const errorMsg = err.response?.data?.error || err.message || "Failed to delete submission.";
+        setGeneralModalMessage(`Error: ${errorMsg}`);
+        setShowGeneralModal(true);
+    } finally {
+        setIsProcessingReattempt(null);
+    }
+  };
+
   const closeResultsModal = () => { setShowResultsModal(false); setSelectedQuizForResults(null); setQuizSubmissions([]); setSubmissionError(null); };
   const closeGeneralModal = () => { setShowGeneralModal(false); setGeneralModalMessage(''); };
   const formatDate = (dateString) => {
@@ -248,12 +245,10 @@ function TeacherDashboard() {
     catch (e) { return dateString; }
   };
 
-  // --- JSX Rendering ---
   return (
     <div className="teacher-dashboard-container">
       <header className="dashboard-header"><h1>Teacher Dashboard</h1></header>
       
-      {/* --- Modals --- */}
       {showGeneralModal && ( <div className="modal-backdrop"><div className="modal-content"><p>{generalModalMessage}</p><button onClick={closeGeneralModal} className="btn btn-primary">Close</button></div></div> )}
       {showResultsModal && selectedQuizForResults && (
           <div className="modal-backdrop results-modal-backdrop">
@@ -263,10 +258,21 @@ function TeacherDashboard() {
                    : submissionError ? <p className="error-message">Error: {submissionError}</p>
                    : quizSubmissions.length > 0 ? (
                       <table className="results-table">
-                          <thead><tr><th>Student Name</th><th>Student Email</th><th>Score</th><th>Percentage</th><th>Date Submitted</th></tr></thead>
+                          <thead><tr><th>Student Name</th><th>Student Email</th><th>Score</th><th>Percentage</th><th>Date Submitted</th><th>Actions</th></tr></thead>
                           <tbody>{quizSubmissions.map(sub => (
-                              <tr key={sub._id}><td>{sub.student?.name || 'N/A'}</td><td>{sub.student?.email || 'N/A'}</td>
-                                  <td>{sub.score} / {sub.totalQuestions}</td><td>{sub.percentage}%</td><td>{formatDate(sub.submittedAt)}</td></tr>))}
+                              <tr key={sub._id}>
+                                  <td>{sub.student?.name || 'N/A'}</td><td>{sub.student?.email || 'N/A'}</td>
+                                  <td>{sub.score} / {sub.totalQuestions}</td><td>{sub.percentage}%</td><td>{formatDate(sub.submittedAt)}</td>
+                                  <td>
+                                      <button
+                                          onClick={() => handleAllowReattempt(sub._id, sub.student?.name || 'Student')}
+                                          className="btn btn-warning btn-extra-small"
+                                          disabled={isProcessingReattempt === sub._id}
+                                      >
+                                          {isProcessingReattempt === sub._id ? 'Processing...' : 'Allow Reattempt'}
+                                      </button>
+                                  </td>
+                              </tr>))}
                           </tbody>
                       </table>
                    ) : <p>No submissions yet for this quiz.</p>}
@@ -276,18 +282,25 @@ function TeacherDashboard() {
       )}
       {showConfirmDeleteModal && quizToDelete && ( <div className="modal-backdrop confirm-delete-modal-backdrop"><div className="modal-content confirm-delete-modal-content"><h2>Confirm Delete</h2><p>Delete "<strong>{quizToDelete.title}</strong>"?</p><p><small>Submissions will also be deleted.</small></p><div className="modal-actions"><button onClick={closeDeleteConfirmModal} className="btn btn-secondary">Cancel</button><button onClick={handleDeleteQuiz} className="btn btn-danger">Delete Quiz</button></div></div></div> )}
 
-      {/* --- Dashboard Content --- */}
       <div className="dashboard-content">
-        {/* Assigned Classrooms Section */}
         <section className="assigned-classrooms-section card">
-   <h2>My Assigned Classrooms</h2>
-   {isLoadingClassrooms ? ( <p>Loading classrooms...</p> ) // Check isLoadingClassrooms state
-    : classroomError ? ( <p className="error-message">Error: {classroomError}</p> ) // Check classroomError state
-    : assignedClassrooms.length === 0 ? ( <p>You have not been assigned to any classrooms yet.</p> ) // Check array length
-    : ( <ul className="classrooms-list">{assignedClassrooms.map(c => <li key={c._id} className="classroom-item"> {/* ... classroom details ... */} </li>)}</ul> )}
- </section>
+           <h2>My Assigned Classrooms</h2>
+           {isLoadingClassrooms ? ( <p>Loading classrooms...</p> )
+            : classroomError ? ( <p className="error-message">Error: {classroomError}</p> )
+            : assignedClassrooms.length === 0 ? ( <p>You have not been assigned to any classrooms yet.</p> )
+            : ( <ul className="classrooms-list">{assignedClassrooms.map(c => (
+                <li key={c._id} className="classroom-item">
+                    <strong>{c.name}</strong>
+                    <div className="enrolled-students">
+                        <strong>Students ({c.students?.length || 0}):</strong>
+                        {c.students && c.students.length > 0 ? (
+                            <ul>{c.students.map(s => <li key={s._id || s.email}>{s.name} ({s.email})</li>)}</ul>
+                        ) : <p><small>No students.</small></p>}
+                    </div>
+                </li>))}
+            </ul> )}
+         </section>
 
-        {/* Quiz Creation/Editing Form Section */}
         <section id="quiz-form-section" className="quiz-creation-section card">
            <h2>{isEditingQuiz ? `Edit Quiz: ${quizForm.title}` : 'Create New Quiz'}</h2>
           {quizFormError && <p className="error-message">Form Error: {quizFormError}</p>}
@@ -304,7 +317,6 @@ function TeacherDashboard() {
                  : assignedClassrooms.map((c) => ( <option key={c._id} value={c._id}> {c.name} </option> ))}
               </select>
             </div>
-
             {quizForm.questions.map((q, index) => (
               <div key={q._id || `new-${index}`} className="question-editor">
                 <div className="question-header">
@@ -337,8 +349,7 @@ function TeacherDashboard() {
           </form>
         </section>
 
-        {/* Quiz Listing Section */}
-         <section className="quiz-list-section card">
+        <section className="quiz-list-section card">
             <h2>My Created Quizzes</h2>
             {isLoadingQuizzes ? ( <p>Loading quizzes...</p> )
              : quizListError ? ( <p className="error-message">Error: {quizListError}</p> )
@@ -365,4 +376,5 @@ function TeacherDashboard() {
     </div>
   );
 }
+
 export default TeacherDashboard;

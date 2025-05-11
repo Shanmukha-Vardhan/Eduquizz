@@ -271,3 +271,18 @@
     background-color: #dc3545;
     color: white;
 }
+
+/* In TeacherDashboard.css - Add this */
+.btn-warning { /* If you use this class for the button */
+  background-color: #ffc107;
+  color: #212529;
+}
+.btn-extra-small {
+  padding: 3px 8px;
+  font-size: 0.8em;
+  line-height: 1.2;
+}
+.results-table td button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
