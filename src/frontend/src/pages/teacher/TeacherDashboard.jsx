@@ -1,7 +1,7 @@
 // Eduquizz/src/frontend/src/pages/teacher/TeacherDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../../styles/TeacherDashboard.css'; // Make sure this CSS file exists and has all necessary styles
+import '../../styles/TeacherDashboard.css'; 
 
 function TeacherDashboard() {
   // --- State ---
@@ -20,14 +20,23 @@ function TeacherDashboard() {
   const [generalModalMessage, setGeneralModalMessage] = useState('');
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [quizToDelete, setQuizToDelete] = useState(null);
+
+  // --- Unified Quiz Form State with questionType ---
+  const initialQuestionState = {
+    _id: null,
+    questionText: '',
+    questionType: 'multiple-choice', // Default type
+    options: ['', '', '', ''],       // Default for MC
+    correctAnswer: ''
+  };
   const [quizForm, setQuizForm] = useState({
-    _id: null, title: '', classroom: '',
-    questions: [{ _id: null, questionText: '', options: ['', '', '', ''], correctAnswer: '' }],
+    _id: null,
+    title: '',
+    classroom: '',
+    questions: [JSON.parse(JSON.stringify(initialQuestionState))], // Deep copy
   });
   const [isEditingQuiz, setIsEditingQuiz] = useState(false);
   const [quizFormError, setQuizFormError] = useState(null);
-
-  // --- NEW STATE FOR REATTEMPT PROCESSING ---
   const [isProcessingReattempt, setIsProcessingReattempt] = useState(null);
 
 
@@ -39,10 +48,8 @@ function TeacherDashboard() {
       if (!token) { setClassroomError("Auth token missing."); setIsLoadingClassrooms(false); return; }
       try {
         const response = await axios.get('/api/classrooms', { headers: { 'Authorization': `Bearer ${token}` } });
-        console.log("[TeacherDashboard] Fetched assigned classrooms:", response.data);
         setAssignedClassrooms(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        console.error("[TeacherDashboard] Error fetching classrooms:", err);
         setClassroomError(err.response?.data?.error || err.message || "Failed to fetch classrooms.");
         setAssignedClassrooms([]);
       } finally { setIsLoadingClassrooms(false); }
@@ -55,16 +62,11 @@ function TeacherDashboard() {
       if (!token) { setQuizListError("Auth token missing."); setIsLoadingQuizzes(false); return; }
       try {
           const response = await axios.get('/api/quizzes', { headers: { 'Authorization': `Bearer ${token}` } });
-          console.log("[TeacherDashboard] Fetched quizzes:", response.data);
           setQuizzes(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-          console.error("[TeacherDashboard] Error fetching quizzes:", err);
           setQuizListError(err.response?.data?.error || err.message || "Failed to fetch quizzes.");
           setQuizzes([]);
-      } finally {
-          setIsLoadingQuizzes(false);
-          console.log("[TeacherDashboard] Finished fetching quizzes. isLoadingQuizzes:", false);
-      }
+      } finally { setIsLoadingQuizzes(false); }
   };
 
   useEffect(() => {
@@ -79,25 +81,37 @@ function TeacherDashboard() {
   };
 
   const handleQuestionFormChange = (index, field, value) => {
-     if (field === 'correctAnswer') {
-        console.log(`[handleQuestionFormChange] Updating Question ${index + 1}, correctAnswer to: "${value}"`);
-     }
      const newQuestions = quizForm.questions.map((q, i) => {
       if (i === index) {
-        if (field.startsWith('option')) {
-          const optionIndex = parseInt(field.replace('option', ''), 10);
-          const updatedOptions = [...q.options]; updatedOptions[optionIndex] = value;
-          return { ...q, options: updatedOptions };
+        const updatedQuestion = { ...q, [field]: value };
+        if (field === 'questionType') {
+          updatedQuestion.options = value === 'true-false' ? ['', ''] : ['', '', '', ''];
+          updatedQuestion.correctAnswer = '';
         }
-        return { ...q, [field]: value };
+        // Note: Direct option manipulation (like q.options[optIndex] = value) was removed
+        // in favor of handleOptionChange for better state update traceability.
+        // If you were relying on that here, ensure handleOptionChange is used for option inputs.
+        return updatedQuestion;
       }
       return q;
     });
     setQuizForm(prev => ({ ...prev, questions: newQuestions }));
   };
+  
+  const handleOptionChange = (qIndex, optIndex, value) => {
+    const newQuestions = quizForm.questions.map((q, i) => {
+        if (i === qIndex) {
+            const newOptions = [...q.options];
+            newOptions[optIndex] = value;
+            return { ...q, options: newOptions };
+        }
+        return q;
+    });
+    setQuizForm(prev => ({ ...prev, questions: newQuestions }));
+  };
 
   const handleAddQuestionToForm = () => {
-     setQuizForm(prev => ({ ...prev, questions: [...prev.questions, { _id: null, questionText: '', options: ['', '', '', ''], correctAnswer: '' }] }));
+     setQuizForm(prev => ({ ...prev, questions: [...prev.questions, JSON.parse(JSON.stringify(initialQuestionState))] }));
   };
 
   const handleRemoveQuestionFromForm = (index) => {
@@ -106,42 +120,43 @@ function TeacherDashboard() {
   };
 
   const resetQuizForm = () => {
-    setQuizForm({ _id: null, title: '', classroom: '', questions: [{ _id: null, questionText: '', options: ['', '', '', ''], correctAnswer: '' }], });
+    setQuizForm({ _id: null, title: '', classroom: '', questions: [JSON.parse(JSON.stringify(initialQuestionState))] });
     setIsEditingQuiz(false); setQuizFormError(null);
   };
 
   const handleSubmitQuizForm = async (e) => {
     e.preventDefault(); setQuizFormError(null);
-    console.log("[handleSubmitQuizForm] Form state on submit:", JSON.stringify(quizForm, null, 2));
     if (!quizForm.classroom) { setGeneralModalMessage("Please select a classroom."); setShowGeneralModal(true); return; }
     if (!quizForm.title.trim()) { setGeneralModalMessage("Please enter a quiz title."); setShowGeneralModal(true); return; }
-    let validationFailed = false;
-    for (let index = 0; index < quizForm.questions.length; index++) {
-        const q = quizForm.questions[index];
-        const hasText = q.questionText?.trim(); const hasAnswer = q.correctAnswer?.trim();
-        const hasOptionsArray = Array.isArray(q.options);
-        const nonEmptyOptions = hasOptionsArray ? q.options.filter(opt => opt?.trim()) : [];
-        const hasAtLeastOneOption = nonEmptyOptions.length > 0;
-        if (!hasText || !hasAnswer || !hasOptionsArray || !hasAtLeastOneOption) {
-            setGeneralModalMessage(`Ensure Question ${index + 1} fields, at least one non-empty option, and the correct answer are filled.`);
-            setShowGeneralModal(true); validationFailed = true; break;
+    
+    for (const q_form of quizForm.questions) {
+        if (!q_form.questionText.trim() || !q_form.correctAnswer.trim()) {
+            setGeneralModalMessage("All questions must have text and a correct answer selected/entered.");
+            setShowGeneralModal(true); return;
         }
-        const validOptions = q.options.map(opt => opt.trim()).filter(opt => opt);
-        const answerMatchesOption = validOptions.includes(q.correctAnswer.trim());
-        if (!answerMatchesOption) {
-            setGeneralModalMessage(`Correct answer for Question ${index + 1} ("${q.correctAnswer}") must match one of the non-empty options provided.`);
-            setShowGeneralModal(true); validationFailed = true; break;
+        const nonEmptyOptions = q_form.options.filter(opt => opt && opt.trim() !== "");
+        if (q_form.questionType === 'multiple-choice' && nonEmptyOptions.length < 2) {
+            setGeneralModalMessage(`Question "${q_form.questionText.substring(0,20)}..." (Multiple Choice) requires at least 2 non-empty options.`);
+            setShowGeneralModal(true); return;
+        }
+        if (q_form.questionType === 'true-false' && nonEmptyOptions.length !== 2) {
+            setGeneralModalMessage(`Question "${q_form.questionText.substring(0,20)}..." (True/False) requires exactly 2 non-empty options.`);
+            setShowGeneralModal(true); return;
+        }
+        if (!nonEmptyOptions.includes(q_form.correctAnswer.trim())) {
+            setGeneralModalMessage(`For question "${q_form.questionText.substring(0,20)}...", the correct answer must match one of the provided non-empty options.`);
+            setShowGeneralModal(true); return;
         }
     }
-    if (validationFailed) { console.log("[handleSubmitQuizForm] Validation failed. Aborting submit."); return; }
-    console.log("[handleSubmitQuizForm] Validation passed. Proceeding with API call.");
+
     const token = localStorage.getItem('token');
     const quizPayload = {
       title: quizForm.title.trim(), classroom: quizForm.classroom,
-      questions: quizForm.questions.map(q => ({
-        _id: q._id, text: q.questionText.trim(),
-        options: q.options.map(opt => opt.trim()).filter(opt => opt),
-        answer: q.correctAnswer.trim(),
+      questions: quizForm.questions.map(q_form => ({
+        _id: q_form._id, text: q_form.questionText.trim(),
+        questionType: q_form.questionType,
+        options: q_form.options.map(opt => opt.trim()).filter(opt => opt),
+        answer: q_form.correctAnswer.trim(),
       })),
     };
     try {
@@ -167,7 +182,10 @@ function TeacherDashboard() {
         classroom: quizToEdit.classroom?._id || quizToEdit.classroom,
         questions: quizToEdit.questions.map(q => ({
             _id: q._id, questionText: q.text,
-            options: [...(q.options || []), '', '', '', ''].slice(0, 4), // Ensure 4 options, preserving existing
+            questionType: q.questionType || 'multiple-choice',
+            options: q.questionType === 'true-false'
+                ? [...(q.options || ['','']), ''].slice(0, 2)
+                : [...(q.options || ['','','','']), '', '', '', ''].slice(0, 4),
             correctAnswer: q.answer
         }))
     });
@@ -176,8 +194,12 @@ function TeacherDashboard() {
   };
 
   const handleViewResults = async (quizToView) => {
-    setSelectedQuizForResults(quizToView); setIsLoadingSubmissions(true);
-    setSubmissionError(null); setQuizSubmissions([]); setShowResultsModal(true);
+    console.log("[TeacherDashboard] Viewing results for quiz:", quizToView);
+    setSelectedQuizForResults(quizToView); 
+    setIsLoadingSubmissions(true);
+    setSubmissionError(null); 
+    setQuizSubmissions([]); 
+    setShowResultsModal(true);
     const token = localStorage.getItem('token');
     if (!token) { setSubmissionError("Auth token missing."); setIsLoadingSubmissions(false); return; }
     try {
@@ -188,8 +210,13 @@ function TeacherDashboard() {
     } finally { setIsLoadingSubmissions(false); }
   };
 
-  const openDeleteConfirmModal = (quiz) => { setQuizToDelete(quiz); setShowConfirmDeleteModal(true); };
+  const openDeleteConfirmModal = (quiz) => { 
+    console.log("[TeacherDashboard] Opening delete confirm for quiz:", quiz);
+    setQuizToDelete(quiz); 
+    setShowConfirmDeleteModal(true); 
+  };
   const closeDeleteConfirmModal = () => { setQuizToDelete(null); setShowConfirmDeleteModal(false); };
+
   const handleDeleteQuiz = async () => {
     if (!quizToDelete) return;
     const token = localStorage.getItem('token');
@@ -203,7 +230,6 @@ function TeacherDashboard() {
     } finally { closeDeleteConfirmModal(); }
   };
 
-  // --- NEW: Function to Handle Allowing Reattempt (Deleting a Submission) ---
   const handleAllowReattempt = async (submissionId, studentName) => {
     if (!window.confirm(`Are you sure you want to delete ${studentName}'s attempt? This will allow them to reattempt the quiz.`)) {
         return;
@@ -211,30 +237,20 @@ function TeacherDashboard() {
     setIsProcessingReattempt(submissionId);
     const token = localStorage.getItem('token');
     if (!token) {
-        setGeneralModalMessage("Authentication error. Please log in again.");
-        setShowGeneralModal(true);
-        setIsProcessingReattempt(null);
-        return;
+        setGeneralModalMessage("Authentication error."); setShowGeneralModal(true);
+        setIsProcessingReattempt(null); return;
     }
     try {
-        await axios.delete(`/api/submissions/${submissionId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await axios.delete(`/api/submissions/${submissionId}`, { headers: { 'Authorization': `Bearer ${token}` } });
         setGeneralModalMessage(`${studentName}'s attempt deleted. They can now reattempt the quiz.`);
         setShowGeneralModal(true);
-        if (selectedQuizForResults) { // Refresh results in modal
-            const response = await axios.get(`/api/submissions/quiz/${selectedQuizForResults._id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+        if (selectedQuizForResults) { 
+            const response = await axios.get(`/api/submissions/quiz/${selectedQuizForResults._id}`, { headers: { 'Authorization': `Bearer ${token}` } });
             setQuizSubmissions(Array.isArray(response.data) ? response.data : []);
         }
     } catch (err) {
-        const errorMsg = err.response?.data?.error || err.message || "Failed to delete submission.";
-        setGeneralModalMessage(`Error: ${errorMsg}`);
-        setShowGeneralModal(true);
-    } finally {
-        setIsProcessingReattempt(null);
-    }
+        setGeneralModalMessage(`Error: ${err.response?.data?.error || err.message || "Failed to delete submission."}`); setShowGeneralModal(true);
+    } finally { setIsProcessingReattempt(null); }
   };
 
   const closeResultsModal = () => { setShowResultsModal(false); setSelectedQuizForResults(null); setQuizSubmissions([]); setSubmissionError(null); };
@@ -249,7 +265,15 @@ function TeacherDashboard() {
     <div className="teacher-dashboard-container">
       <header className="dashboard-header"><h1>Teacher Dashboard</h1></header>
       
-      {showGeneralModal && ( <div className="modal-backdrop"><div className="modal-content"><p>{generalModalMessage}</p><button onClick={closeGeneralModal} className="btn btn-primary">Close</button></div></div> )}
+      {showGeneralModal && ( 
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <p>{generalModalMessage}</p>
+            <button onClick={closeGeneralModal} className="btn btn-primary">Close</button>
+          </div>
+        </div> 
+      )}
+
       {showResultsModal && selectedQuizForResults && (
           <div className="modal-backdrop results-modal-backdrop">
               <div className="modal-content results-modal-content">
@@ -280,7 +304,20 @@ function TeacherDashboard() {
               </div>
           </div>
       )}
-      {showConfirmDeleteModal && quizToDelete && ( <div className="modal-backdrop confirm-delete-modal-backdrop"><div className="modal-content confirm-delete-modal-content"><h2>Confirm Delete</h2><p>Delete "<strong>{quizToDelete.title}</strong>"?</p><p><small>Submissions will also be deleted.</small></p><div className="modal-actions"><button onClick={closeDeleteConfirmModal} className="btn btn-secondary">Cancel</button><button onClick={handleDeleteQuiz} className="btn btn-danger">Delete Quiz</button></div></div></div> )}
+
+      {showConfirmDeleteModal && quizToDelete && ( 
+        <div className="modal-backdrop confirm-delete-modal-backdrop">
+          <div className="modal-content confirm-delete-modal-content">
+            <h2>Confirm Delete</h2>
+            <p>Are you sure you want to delete the quiz "<strong>{quizToDelete.title}</strong>"?</p>
+            <p><small>This action cannot be undone, and all associated student submissions will also be deleted.</small></p>
+            <div className="modal-actions">
+              <button onClick={closeDeleteConfirmModal} className="btn btn-secondary">Cancel</button>
+              <button onClick={handleDeleteQuiz} className="btn btn-danger">Delete Quiz</button>
+            </div>
+          </div>
+        </div> 
+      )}
 
       <div className="dashboard-content">
         <section className="assigned-classrooms-section card">
@@ -317,6 +354,7 @@ function TeacherDashboard() {
                  : assignedClassrooms.map((c) => ( <option key={c._id} value={c._id}> {c.name} </option> ))}
               </select>
             </div>
+            
             {quizForm.questions.map((q, index) => (
               <div key={q._id || `new-${index}`} className="question-editor">
                 <div className="question-header">
@@ -325,19 +363,49 @@ function TeacherDashboard() {
                         <button type="button" onClick={() => handleRemoveQuestionFromForm(index)} className="btn btn-danger btn-small remove-question-btn" title="Remove Question">X</button>
                     )}
                 </div>
+
+                <div className="form-group">
+                    <label htmlFor={`qType-${index}`}>Question Type:</label>
+                    <select
+                        id={`qType-${index}`}
+                        name="questionType" // Added name attribute for consistency
+                        value={q.questionType}
+                        onChange={(e) => handleQuestionFormChange(index, 'questionType', e.target.value)}
+                    >
+                        <option value="multiple-choice">Multiple Choice</option>
+                        <option value="true-false">True/False</option>
+                    </select>
+                </div>
+
                 <div className="form-group">
                   <label htmlFor={`qText-${index}`}>Question Text:</label>
-                  <input id={`qText-${index}`} type="text" value={q.questionText} onChange={(e) => handleQuestionFormChange(index, 'questionText', e.target.value)} placeholder="Enter question text" required/>
+                  <input id={`qText-${index}`} name="questionText" type="text" value={q.questionText} onChange={(e) => handleQuestionFormChange(index, 'questionText', e.target.value)} placeholder="Enter question text" required/>
                 </div>
-                {[0, 1, 2, 3].map(optIndex => (
-                  <div key={optIndex} className="form-group option-group">
-                    <label htmlFor={`opt-${index}-${optIndex}`}>Option {optIndex + 1}:</label>
-                    <input id={`opt-${index}-${optIndex}`} type="text" value={q.options[optIndex] || ''} onChange={(e) => handleQuestionFormChange(index, `option${optIndex}`, e.target.value)} placeholder={`Option ${optIndex + 1}`} />
-                  </div>
-                ))}
+
+                {q.questionType === 'multiple-choice' && (
+                    [0, 1, 2, 3].map(optIndex => (
+                      <div key={`mc-opt-${optIndex}`} className="form-group option-group">
+                        <label htmlFor={`opt-mc-${index}-${optIndex}`}>Option {optIndex + 1}:</label>
+                        <input id={`opt-mc-${index}-${optIndex}`} type="text" value={q.options[optIndex] || ''} 
+                               onChange={(e) => handleOptionChange(index, optIndex, e.target.value)} 
+                               placeholder={`Option ${optIndex + 1}`} />
+                      </div>
+                    ))
+                )}
+                {q.questionType === 'true-false' && (
+                    [0, 1].map(optIndex => (
+                      <div key={`tf-opt-${optIndex}`} className="form-group option-group">
+                        <label htmlFor={`opt-tf-${index}-${optIndex}`}>Option {optIndex + 1}: </label>
+                        <input id={`opt-tf-${index}-${optIndex}`} type="text" value={q.options[optIndex] || ''} 
+                               onChange={(e) => handleOptionChange(index, optIndex, e.target.value)} 
+                               placeholder={optIndex === 0 ? "e.g., True" : "e.g., False"} required/>
+                      </div>
+                    ))
+                )}
+                
                 <div className="form-group">
                   <label htmlFor={`qAns-${index}`}>Correct Answer (text):</label>
-                  <input id={`qAns-${index}`} type="text" value={q.correctAnswer} onChange={(e) => handleQuestionFormChange(index, 'correctAnswer', e.target.value)} placeholder="Enter the text of the correct option" required/>
+                  <input id={`qAns-${index}`} name="correctAnswer" type="text" value={q.correctAnswer} onChange={(e) => handleQuestionFormChange(index, 'correctAnswer', e.target.value)} placeholder="Enter the text of the correct option" required/>
                 </div>
               </div>
             ))}
