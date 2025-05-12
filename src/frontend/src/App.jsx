@@ -21,10 +21,10 @@ import AvailableQuizzesPage from './pages/student/AvailableQuizzesPage';
 import MyResultsPage from './pages/student/MyResultsPage';                 
 import QuizAttempt from './pages/student/QuizAttempt';
 
-
-// Other Pages
+// Other Pages & Components
 import Login from './pages/Login';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -47,6 +47,7 @@ function App() {
     checkAuth();
   }, []);
 
+  // AppRoutes is now directly rendering the main layout structure
   const AppRoutes = () => {
     const navigate = useNavigate();
 
@@ -57,9 +58,12 @@ function App() {
       navigate('/');
     };
 
-    const ProtectedRoute = ({ children, allowedRole }) => {
+    const ProtectedRoute = ({ children, allowedRole, publicPage = false }) => {
       if (authLoading) {
         return null;
+      }
+      if (publicPage) {
+        return children;
       }
       if (!isAuthenticated) {
          return <Navigate to="/" replace />;
@@ -75,7 +79,8 @@ function App() {
     };
 
     return (
-        <>
+        // This div is the main layout wrapper returned by AppRoutes
+        <div className="app-layout"> 
             <Navbar 
                 isAuthenticated={isAuthenticated} 
                 userRole={userRole} 
@@ -123,16 +128,19 @@ function App() {
                     <Route path="/teacher/student-performance" element={<ProtectedRoute allowedRole="teacher"><div>Student Performance Page (Teacher) - Coming Soon</div></ProtectedRoute>} />
                     <Route path="/teacher/notifications" element={<ProtectedRoute allowedRole="teacher"><div>Notifications Page (Teacher) - Coming Soon</div></ProtectedRoute>} />
                     
-                    {/* === STUDENT ROUTES (Updated) === */}
+                    {/* === STUDENT ROUTES === */}
                     <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentOverviewDashboard /></ProtectedRoute>} />
-                    <Route path="/student/quizzes" element={<ProtectedRoute allowedRole="student"><AvailableQuizzesPage /></ProtectedRoute>} /> {/* "Take Quiz" link could point here */}
+                    <Route path="/student/quizzes" element={<ProtectedRoute allowedRole="student"><AvailableQuizzesPage /></ProtectedRoute>} />
                     <Route path="/student/results" element={<ProtectedRoute allowedRole="student"><MyResultsPage /></ProtectedRoute>} />
-                    {/* Placeholder routes for other Student Navbar links */}
                     <Route path="/student/upcoming" element={<ProtectedRoute allowedRole="student"><div>Upcoming Quizzes Page (Student) - Coming Soon</div></ProtectedRoute>} />
                     <Route path="/student/profile" element={<ProtectedRoute allowedRole="student"><div>My Profile Page (Student) - Coming Soon</div></ProtectedRoute>} />
                     
                     <Route path="/quiz/:quizId" element={<ProtectedRoute><QuizAttempt /></ProtectedRoute>} />
+                    
                     <Route path="/help" element={<ProtectedRoute><div>Help / FAQ Page - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/contact-me" element={<ProtectedRoute publicPage={true}><div>Contact Me Page - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/privacy-policy" element={<ProtectedRoute publicPage={true}><div>Privacy Policy Page - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/terms-of-service" element={<ProtectedRoute publicPage={true}><div>Terms of Service Page - Coming Soon</div></ProtectedRoute>} />
 
                     <Route path="*" element={
                         <div><h2>Page Not Found (404)</h2><p>The page you are looking for does not exist.</p><Link to="/">Go to Homepage</Link></div>
@@ -140,11 +148,18 @@ function App() {
                   </Routes>
               )}
             </main>
-        </>
+            <Footer />
+        </div> // Closing tag for div.app-layout
     );
-  };
+  }; // End of AppRoutes
 
-  return ( <Router><div className="App"><AppRoutes /></div></Router> );
+  // The main App component now just sets up the Router and the top-level .App div
+  return ( 
+    <Router>
+      <div className="App"> 
+        <AppRoutes />
+      </div>
+    </Router> 
+  );
 }
 export default App;
-

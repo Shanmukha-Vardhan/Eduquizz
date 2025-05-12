@@ -257,3 +257,26 @@ a:hover {
     color: #6B7280; /* Neutral gray for loading text */
 }
 
+.App { /* The outermost div in App.jsx's return */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures the app container takes at least full viewport height */
+}
+
+.app-layout { /* The div/fragment returned by AppRoutes component */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows this layout to grow and fill .App */
+}
+
+.app-content {
+  flex-grow: 1; /* Allows main content to take available space, pushing footer down */
+  padding-top: 75px; 
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 2rem; 
+  width: 100%;
+  max-width: 1200px; 
+  margin: 0 auto; 
+  box-sizing: border-box;
+}

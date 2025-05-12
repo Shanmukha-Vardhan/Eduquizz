@@ -67,7 +67,7 @@ function Navbar({ isAuthenticated, userRole, handleLogout }) {
     <nav className="navbar-main">
       <div className="navbar-container">
         <Link to={isAuthenticated && userRole ? (userRole === 'admin' ? '/admin' : userRole === 'teacher' ? '/teacher' : '/student') : '/'} className="navbar-logo">
-          EduQuiz
+          .SHANMUKHA
         </Link>
         
         {isAuthenticated && (
