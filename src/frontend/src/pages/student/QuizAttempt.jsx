@@ -14,11 +14,10 @@ function QuizAttempt() {
   const [error, setError] = useState(null);
   const [score, setScore] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submittedAnswersDetails, setSubmittedAnswersDetails] = useState([]); // For detailed results
+  const [submittedAnswersDetails, setSubmittedAnswersDetails] = useState([]);
 
   useEffect(() => {
     const fetchQuizDetails = async () => {
-      console.log(`[QuizAttempt] Fetching details for quiz ID: ${quizId}`);
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem('token');
@@ -30,24 +29,17 @@ function QuizAttempt() {
 
       try {
         const response = await axios.get(`/api/quizzes/${quizId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
-        console.log("[QuizAttempt] Fetched quiz data:", response.data);
         setQuiz(response.data);
-        
         const initialAnswers = {};
         if (response.data && response.data.questions) {
-            response.data.questions.forEach(q => {
-                // q._id should be the unique identifier from the Quiz model's questions array
-                initialAnswers[q._id] = ''; // Initialize with empty string for each question
-            });
+          response.data.questions.forEach(q => {
+            initialAnswers[q._id] = '';
+          });
         }
         setSelectedAnswers(initialAnswers);
-
       } catch (err) {
-        console.error("[QuizAttempt] Error fetching quiz details:", err);
         setError(err.response?.data?.error || err.message || "Failed to load quiz details.");
       } finally {
         setIsLoading(false);
@@ -79,43 +71,39 @@ function QuizAttempt() {
   };
 
   const handleSubmitQuiz = async () => {
-    console.log("[QuizAttempt] Submitting quiz. Selected answers:", selectedAnswers);
     const token = localStorage.getItem('token');
     if (!token || !quiz) {
-        setError("Cannot submit quiz. Missing token or quiz data.");
-        return;
+      setError("Cannot submit quiz. Missing token or quiz data.");
+      return;
     }
 
     const submissionAnswers = quiz.questions.map(q => ({
-        questionId: q._id, // This is crucial. Your Quiz model's questions should have _id.
-        selectedOption: selectedAnswers[q._id] || "" // Use q._id as the key
+      questionId: q._id,
+      selectedOption: selectedAnswers[q._id] || ""
     }));
 
     try {
-        setIsLoading(true);
-        const response = await axios.post(`/api/quizzes/${quizId}/submit`,
-            { answers: submissionAnswers },
-            { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        console.log("[QuizAttempt] Quiz submission response:", response.data);
-        setScore(response.data.score);
-        setSubmittedAnswersDetails(response.data.answers || []); // Store detailed answers from backend
-        setIsSubmitted(true);
+      setIsLoading(true);
+      const response = await axios.post(`/api/quizzes/${quizId}/submit`,
+        { answers: submissionAnswers },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      setScore(response.data.score);
+      setSubmittedAnswersDetails(response.data.answers || []);
+      setIsSubmitted(true);
     } catch (err) {
-        console.error("[QuizAttempt] Error submitting quiz:", err);
-        setError(err.response?.data?.error || err.message || "Failed to submit quiz.");
-        // Keep isSubmitted false if error occurs during submission
-        setIsSubmitted(false); 
+      setError(err.response?.data?.error || err.message || "Failed to submit quiz.");
+      setIsSubmitted(false);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
-  if (isLoading && !isSubmitted) { // Show loading only if not yet submitted or during submission
+  if (isLoading && !isSubmitted) {
     return <div className="quiz-attempt-container loading">Loading Quiz...</div>;
   }
 
-  if (error) { // Display error if any occurred, even after submission attempt
+  if (error) {
     return <div className="quiz-attempt-container error-message">Error: {error}</div>;
   }
 
@@ -123,43 +111,38 @@ function QuizAttempt() {
     return <div className="quiz-attempt-container">Quiz data is not available or the quiz has no questions.</div>;
   }
 
-  // Display results if submitted
   if (isSubmitted) {
     return (
-        <div className="quiz-attempt-container quiz-results">
-            <h2>Quiz Submitted!</h2>
-            <h3>
-              Your Score: {score !== null ? `${score} / ${quiz.questions.length}` : "Calculating..."} 
-              {quiz.questions.length > 0 && score !== null ? ` (${((score / quiz.questions.length) * 100).toFixed(2)}%)` : ''}
-            </h3>
-            
-            <h4>Detailed Results:</h4>
-            {submittedAnswersDetails.length > 0 ? (
-                <ul className="detailed-results-list">
-                    {submittedAnswersDetails.map((ans, index) => (
-                        <li key={ans.questionId || index} className={`result-item ${ans.isCorrect ? 'correct' : 'incorrect'}`}>
-                            <p><strong>Question {index + 1}:</strong> {ans.questionText}</p>
-                            <p>Your Answer: <span className={ans.isCorrect ? '' : 'incorrect-answer-text'}>{ans.selectedOption || "Not answered"}</span></p>
-                            {!ans.isCorrect && (
-                                <p>Correct Answer: <span className="correct-answer-text">{ans.correctAnswer}</span></p>
-                            )}
-                            {ans.isCorrect && <p className="correct-answer-text">✓ Correct</p>}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>Detailed results are not available.</p>
-            )}
-
-            <button onClick={() => navigate('/student')} className="btn btn-primary btn-back-dashboard">Back to Dashboard</button>
-        </div>
+      <div className="quiz-attempt-container quiz-results">
+        <h2>Quiz Submitted!</h2>
+        <h3>
+          Your Score: {score !== null ? `${score} / ${quiz.questions.length}` : "Calculating..."}
+          {quiz.questions.length > 0 && score !== null ? ` (${((score / quiz.questions.length) * 100).toFixed(2)}%)` : ''}
+        </h3>
+        <h4>Detailed Results:</h4>
+        {submittedAnswersDetails.length > 0 ? (
+          <ul className="detailed-results-list">
+            {submittedAnswersDetails.map((ans, index) => (
+              <li key={ans.questionId || index} className={`result-item ${ans.isCorrect ? 'correct' : 'incorrect'}`}>
+                <p><strong>Question {index + 1}:</strong> {ans.questionText}</p>
+                <p>Your Answer: <span className={ans.isCorrect ? '' : 'incorrect-answer-text'}>{ans.selectedOption || "Not answered"}</span></p>
+                {!ans.isCorrect && (
+                  <p>Correct Answer: <span className="correct-answer-text">{ans.correctAnswer}</span></p>
+                )}
+                {ans.isCorrect && <p className="correct-answer-text">✓ Correct</p>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>Detailed results are not available.</p>
+        )}
+        <button onClick={() => navigate('/student')} className="btn btn-primary btn-back-dashboard">Back to Dashboard</button>
+      </div>
     );
   }
 
-  // Display quiz questions if not submitted
   const currentQuestion = quiz.questions[currentQuestionIndex];
-  // Ensure currentQuestion and currentQuestion._id exist before trying to access them
-  const questionIdentifier = currentQuestion?._id; 
+  const questionIdentifier = currentQuestion?._id;
 
   return (
     <div className="quiz-attempt-container">
@@ -168,7 +151,7 @@ function QuizAttempt() {
         <p>Question {currentQuestionIndex + 1} of {quiz.questions.length}</p>
       </header>
 
-      {currentQuestion && questionIdentifier ? ( // Check if currentQuestion and its identifier are valid
+      {currentQuestion && questionIdentifier ? (
         <section className="question-section">
           <h3 className="question-text">{currentQuestion.text}</h3>
           <div className="options-list">
@@ -177,7 +160,7 @@ function QuizAttempt() {
                 <input
                   type="radio"
                   id={`q${currentQuestionIndex}-option${index}`}
-                  name={`question-${questionIdentifier}`} // Use unique questionIdentifier for name
+                  name={`question-${questionIdentifier}`}
                   value={option}
                   checked={selectedAnswers[questionIdentifier] === option}
                   onChange={() => handleOptionChange(questionIdentifier, option)}
@@ -188,13 +171,13 @@ function QuizAttempt() {
           </div>
         </section>
       ) : (
-        <p>Loading question...</p> // Fallback if question data isn't ready
+        <p>Loading question...</p>
       )}
 
       <footer className="quiz-navigation">
-        <button 
-          onClick={handlePreviousQuestion} 
-          disabled={currentQuestionIndex === 0} 
+        <button
+          onClick={handlePreviousQuestion}
+          disabled={currentQuestionIndex === 0}
           className="btn btn-secondary"
         >
           Previous

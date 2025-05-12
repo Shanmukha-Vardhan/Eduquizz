@@ -1,51 +1,79 @@
+/* Eduquizz/src/frontend/src/styles/Login.css */
+
 .login-container {
-    font-family: Arial, sans-serif;
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
+  max-width: 450px;
+  margin: 5rem auto; /* Add more margin from top */
+  padding: 2rem 2.5rem;
+  background-color: #FFFFFF; /* White background for the login card */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Slightly more prominent shadow for login card */
+  text-align: left; /* Override global text-align if it was center */
+}
 
-  .error-toast {
-    background-color: #ffdddd;
-    padding: 10px;
-    color: #d8000c;
-    border: 1px solid #d8000c;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    text-align: center;
-  }
+.login-container h2 {
+  text-align: center;
+  color: #3B82F6; /* Primary - Royal Blue for the title */
+  margin-bottom: 1.5rem;
+  font-size: 1.8em;
+}
 
-  .login-container h2 {
-    text-align: center;
-  }
-  
-  .login-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .login-container input {
-    padding: 0.5rem;
-    font-size: 1rem;
-  }
-  
-  .login-container button {
-    padding: 0.5rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .login-container button:hover {
-    background: #0056b3;
-  }
-  
-  .error {
-    color: red;
-    text-align: center;
-  }
+/* Form group styling is largely inherited from App.css, 
+   but you can add specific tweaks here if needed */
+.login-container .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.login-container .form-group label {
+  font-weight: 500; /* Slightly less bold than default if desired */
+  color: #4B5563; /* A slightly softer dark gray for labels */
+}
+
+/* Input fields will inherit focus styles from App.css (blue border/shadow) */
+/* You can override if you want a different focus color specifically for login */
+
+/* Login button - using .btn and .btn-primary from App.css */
+.login-button {
+  width: 100%; /* Make login button full width */
+  padding: 0.75rem 1rem; /* Slightly larger padding for a primary action button */
+  font-size: 1rem;
+  margin-top: 0.5rem; /* Add some space above the button */
+}
+/* If you want the login button to use the Accent color instead: */
+/*
+.login-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  background-color: #FBBF24; // Accent - Amber
+  border-color: #FBBF24;
+  color: #111827; // Dark text on Amber
+}
+.login-button:hover {
+  background-color: #F59E0B; // Darker Amber
+  border-color: #D97706;
+}
+*/
+
+/* Error message styling is inherited from App.css (.error-message) */
+/* If you need specific styling for login errors: */
+.login-container .error-message {
+  margin-top: 1rem;
+  margin-bottom: 0; /* Remove bottom margin if button is directly after */
+  text-align: center;
+}
+
+/* Optional: Links for "Forgot Password?" or "Sign Up" */
+.login-links {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.login-links a {
+  color: #3B82F6; /* Primary - Royal Blue */
+  font-size: 0.9em;
+  margin: 0 0.5rem;
+}
+.login-links a:hover {
+  text-decoration: underline;
+}

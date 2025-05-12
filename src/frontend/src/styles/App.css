@@ -1,49 +1,259 @@
-.App {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 1rem;
+/* Eduquizz/src/frontend/src/styles/App.css */
+
+/* --- Global Resets & Base Styles --- */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif; /* Modern system font stack */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F9FAFB; /* Background - Soft Light Gray / Off White */
+  color: #111827; /* Text - Dark Slate / Graphite */
+  line-height: 1.6;
 }
 
-.app-header {
-  background: #333;
-  color: white;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.app-header h1 {
+/* Remove default browser margin from common elements */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, figure, blockquote, dl, dd {
   margin: 0;
 }
 
-.app-nav {
+/* Set core root defaults */
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* --- General App Container --- */
+.App {
+  /* text-align: center; /* You can keep this if you want global center alignment, 
+                           but often components handle their own alignment. 
+                           Removing for now to allow more flexible component layouts. */
+  min-height: 100vh; /* Ensure app takes at least full viewport height */
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  flex-direction: column; /* Allows navbar to be at top and content below */
 }
 
-.nav-link {
-  color: white;
+/* --- Main Content Area (Below Navbar) --- */
+.app-content {
+  flex-grow: 1; /* Allows content to take available space */
+  padding-top: 75px; /* Adjust based on your Navbar's height to prevent overlap. 
+                        Measure your actual Navbar height. */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 2rem; /* Give some space at the bottom */
+  width: 100%;
+  max-width: 1200px; /* Optional: constrain max width of content area */
+  margin: 0 auto; /* Center content area if max-width is set */
+  box-sizing: border-box;
+}
+
+/* --- Headings --- */
+h1, h2, h3, h4, h5, h6 {
+  color: #111827; /* Text - Dark Slate / Graphite */
+  margin-bottom: 0.75em; /* Default bottom margin for headings */
+  line-height: 1.3;
+}
+
+h1 { font-size: 2.2em; }
+h2 { font-size: 1.8em; }
+h3 { font-size: 1.5em; }
+/* Add more as needed */
+
+/* --- Links --- */
+a {
+  color: #3B82F6; /* Primary - Royal Blue for general links */
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  background: #555;
-  border-radius: 5px;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-.nav-link:hover {
-  background: #777;
-}
-
-.app-nav button {
-  padding: 0.5rem 1rem;
-  background: #dc3545;
-  color: white;
-  border: none;
+/* --- Buttons (Global Base Styles - can be overridden by component-specific styles) --- */
+.btn {
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
   cursor: pointer;
-  border-radius: 5px;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+              border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.app-nav button:hover {
-  background: #c82333;
+.btn-primary {
+  color: #fff;
+  background-color: #3B82F6; /* Primary - Royal Blue */
+  border-color: #3B82F6;
 }
+.btn-primary:hover {
+  background-color: #2563EB; /* Darker Royal Blue */
+  border-color: #1D4ED8;
+}
+
+.btn-secondary { /* For less prominent actions */
+  color: #fff;
+  background-color: #6B7280; /* A neutral gray */
+  border-color: #6B7280;
+}
+.btn-secondary:hover {
+  background-color: #4B5563;
+  border-color: #374151;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #10B981; /* Secondary - Emerald Green */
+  border-color: #10B981;
+}
+.btn-success:hover {
+  background-color: #059669;
+  border-color: #047857;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #EF4444; /* Error/Warning - Soft Red */
+  border-color: #EF4444;
+}
+.btn-danger:hover {
+  background-color: #DC2626;
+  border-color: #B91C1C;
+}
+
+.btn-warning { /* For actions like "Allow Reattempt" or less critical warnings */
+  color: #111827; /* Dark text for contrast on yellow */
+  background-color: #FBBF24; /* Accent - Amber */
+  border-color: #FBBF24;
+}
+.btn-warning:hover {
+  background-color: #F59E0B; /* Darker Amber */
+  border-color: #D97706;
+}
+
+.btn-info { /* For "View Results" type buttons */
+    color: #fff;
+    background-color: #3B82F6; /* Primary - Royal Blue (or a lighter shade) */
+    border-color: #3B82F6;
+}
+.btn-info:hover {
+    background-color: #2563EB;
+    border-color: #1D4ED8;
+}
+
+.btn-light { /* For "Cancel" or very subtle actions */
+    color: #111827;
+    background-color: #E5E7EB; /* Light gray */
+    border-color: #D1D5DB;
+}
+.btn-light:hover {
+    background-color: #D1D5DB;
+    border-color: #9CA3AF;
+}
+
+
+/* --- Form Elements (Basic Styling - can be enhanced) --- */
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left; /* Align labels and inputs left by default in forms */
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #111827; /* Text - Dark Slate */
+}
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group select,
+.form-group textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #111827; /* Text color */
+  background-color: #FFFFFF; /* White background for inputs */
+  background-clip: padding-box;
+  border: 1px solid #D1D5DB; /* Light gray border */
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  box-sizing: border-box; /* Ensure padding and border are inside width */
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #3B82F6; /* Primary - Royal Blue on focus */
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25); /* Subtle focus glow */
+}
+
+/* --- Cards (Global Base Style for consistency) --- */
+.card {
+  background-color: #FFFFFF; /* Default card background to white */
+  border: 1px solid #E5E7EB; /* Light border */
+  border-radius: 0.5rem; /* Slightly more rounded */
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Subtle shadow */
+}
+
+/* --- Modals (Basic Backdrop and Content Styling) --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Higher than navbar */
+}
+.modal-content {
+  background-color: #FFFFFF; /* White background for modal content */
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  max-width: 500px; /* Default max width */
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  text-align: left; /* Default text align for modal content */
+}
+.modal-content h2 {
+  margin-top: 0;
+  color: #3B82F6; /* Primary color for modal titles */
+}
+
+/* --- Error Messages --- */
+.error-message {
+  color: #EF4444; /* Error/Warning - Soft Red */
+  background-color: #FEE2E2; /* Light red background */
+  border: 1px solid #FCA5A5; /* Reddish border */
+  padding: 0.75rem 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* --- Loading Container --- */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 75px); /* Adjust 75px based on actual navbar height */
+    font-size: 1.2em;
+    color: #6B7280; /* Neutral gray for loading text */
+}
+

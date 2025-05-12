@@ -1,134 +1,148 @@
-.student-dashboard {
-    font-family: Arial, sans-serif;
-    padding: 1rem;
-  }
-  
-  .student-header {
-    background: #dc3545;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-  }
-  
-  .student-main {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .classrooms {
-    margin-bottom: 2rem;
-  }
-  
-  .classroom-list {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .classroom-item {
-    background: #e0e0e0;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-  }
-  
-  .quizzes {
-    margin-top: 2rem;
-  }
-  
-  .quiz-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .quiz-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    background: #f9f9f9;
-    margin-bottom: 0.5rem;
-    border-radius: 5px;
-  }
-  
-  .start-quiz-btn {
-    padding: 0.25rem 0.5rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  @media (max-width: 600px) {
-    .classroom-list {
-      flex-direction: column;
-    }
-  
-    .quiz-list li {
-      flex-direction: column;
-      text-align: center;
-    }
-  
-    .start-quiz-btn {
-      margin-top: 0.5rem;
-    }
-  }
+/* Eduquizz/src/frontend/src/styles/StudentDashboard.css */
 
-  /* In StudentDashboard.css */
-.student-main .card {
-  background-color: #fff;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.student-dashboard {
+  /* The main .app-content in App.css already provides padding and max-width */
 }
 
-.quiz-list .quiz-item {
+.student-header { /* This class was in your StudentDashboard.jsx */
+  /* If you want a specific header bar for the student dashboard page itself */
+  /* For example:
+  background-color: #3B82F6; /* Primary - Royal Blue */
+  /* color: #FFFFFF; */
+  /* padding: 1rem 1.5rem; */
+  /* margin-bottom: 1.5rem; */
+  /* border-radius: 0 0 8px 8px; /* Rounded bottom corners if it's a bar */
+  /* text-align: center; */
+}
+
+.student-header h1 {
+  color: #111827; /* Text - Dark Slate, or keep it white if using a colored header bg */
+  font-size: 2em;   /* Adjust as needed */
+  margin-bottom: 1.5rem; /* Space below the main dashboard title */
+  text-align: center; /* Center the main dashboard title */
+}
+
+.student-main .card {
+  /* Inherits .card style from App.css (white bg, shadow, padding, margin-bottom) */
+  /* You can add specific overrides for student dashboard cards if needed */
+  /* e.g., different padding or margin */
+}
+
+.student-main .card h2 {
+  color: #3B82F6; /* Primary - Royal Blue for section titles */
+  font-size: 1.5em;
+  border-bottom: 2px solid #E0E7FF; /* Muted Slate Blue as an underline */
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* My Classrooms Section */
+.classroom-list {
+  list-style: none;
+  padding: 0;
+}
+.classroom-item {
+  background-color: #F9FAFB; /* Soft Light Gray - slightly different from card bg for subtle separation */
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #E5E7EB; /* Light border */
+  font-weight: 500;
+  color: #111827; /* Text color */
+}
+
+/* Available Quizzes Section */
+.quiz-list {
+  list-style: none;
+  padding: 0;
+}
+
+.quiz-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  padding: 0.75rem 0; /* Vertical padding, no horizontal as items inside will have it */
+  border-bottom: 1px solid #E5E7EB; /* Light separator line */
 }
-.quiz-list .quiz-item:last-child {
+.quiz-item:last-child {
   border-bottom: none;
 }
+
 .quiz-info {
   flex-grow: 1;
+  margin-right: 1rem; /* Space between info and button */
+}
+.quiz-info strong {
+  color: #111827; /* Text color */
+  font-size: 1.1em;
 }
 .quiz-classroom-info {
-  font-size: 0.9em;
-  color: #555;
-  margin-left: 5px;
+  font-size: 0.85em;
+  color: #6B7280; /* Muted gray for secondary info */
+  margin-left: 0.5em;
+  display: block; /* Put classroom info on new line or keep inline */
 }
+
 .attempted-badge {
-  background-color: #6c757d; /* Secondary color */
+  background-color: #6B7280;  /* Neutral Gray for attempted */
   color: white;
   font-size: 0.75em;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 10px;
+  padding: 3px 8px;
+  border-radius: 10px; /* Pill shape */
+  margin-left: 0.75em;
   vertical-align: middle;
+  font-weight: 500;
 }
-.start-quiz-btn { /* General button styling if not already global */
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+
+/* Start Quiz / View Score Button - uses .btn classes from App.css */
+.start-quiz-btn { /* This class is on the button in StudentDashboard.jsx */
+  /* .btn-primary and .btn-secondary are applied dynamically in JSX */
+  min-width: 110px; /* Give buttons a consistent minimum width */
+  text-align: center;
 }
-.btn-primary { background-color: #007bff; color: white; }
-.btn-secondary { background-color: #6c757d; color: white; }
 
 
-.submissions-history h2 { margin-bottom: 15px; }
+/* My Quiz Attempts Section */
+.submissions-history h2 { /* Already styled by .card h2 */
+}
+
 .submissions-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 1rem;
+  font-size: 0.9em;
 }
-.submissions-table th, .submissions-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+.submissions-table th, 
+.submissions-table td {
+  border: 1px solid #E0E7FF; /* Muted Slate Blue for table borders */
+  padding: 0.75rem 1rem; /* Increased padding */
   text-align: left;
+  color: #111827; /* Text color */
 }
 .submissions-table th {
-  background-color: #f2f2f2;
+  background-color: #E0E7FF; /* Muted Slate Blue for table header */
+  color: #3730A3; /* A darker blue/purple for header text for contrast */
+  font-weight: 600;
+}
+.submissions-table tbody tr:nth-child(even) {
+  background-color: #F9FAFB; /* Soft Light Gray for alternate rows */
+}
+.submissions-table tbody tr:hover {
+  background-color: #EFF6FF; /* Light blue hover for table rows */
+}
+
+/* Ensure error messages for specific sections are styled if not using global .error-message */
+.student-main .card .error-message {
+    /* Inherits from global .error-message in App.css */
+    /* Add specific overrides if needed */
+    margin-top: 0.5rem;
+}
+.student-main .card p { /* For "No classrooms available" etc. */
+    color: #6B7280; /* Muted gray */
+}
+/* In StudentDashboard.css or App.css */
+.quick-links-container {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }

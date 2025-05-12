@@ -1,185 +1,150 @@
 // src/frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate, Link } from 'react-router-dom';
 import './styles/App.css';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import TeacherDashboard from './pages/teacher/TeacherDashboard';
-import StudentDashboard from './pages/student/StudentDashboard'; // Ensure this path is correct
+
+// Admin Pages
+import AdminOverviewDashboard from './pages/admin/AdminOverviewDashboard';
+import ManageUsersPage from './pages/admin/ManageUsersPage';
+import CreateUserPage from './pages/admin/CreateUserPage';
+import AdminDashboard from './pages/admin/AdminDashboard'; 
+
+// Teacher Pages
+import TeacherOverviewDashboard from './pages/teacher/TeacherOverviewDashboard';
+import MyClassroomsPage from './pages/teacher/MyClassroomsPage';
+import CreateQuizPageTeacher from './pages/teacher/CreateQuizPageTeacher';
+import QuizLibraryPage from './pages/teacher/QuizLibraryPage';
+
+// Student Pages
+import StudentOverviewDashboard from './pages/student/StudentOverviewDashboard'; 
+import AvailableQuizzesPage from './pages/student/AvailableQuizzesPage';     
+import MyResultsPage from './pages/student/MyResultsPage';                 
+import QuizAttempt from './pages/student/QuizAttempt';
+
+
+// Other Pages
 import Login from './pages/Login';
-import QuizAttempt from './pages/student/QuizAttempt'; // New import
+import Navbar from './components/Navbar';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [authLoading, setAuthLoading] = useState(true);
 
-  console.log(
-    `%c App Render: Auth=${isAuthenticated}, Role='${userRole}', Loading=${authLoading}`,
-    'color: orange; font-weight: bold;'
-  );
-
   useEffect(() => {
-    console.log('%c App useEffect Running: Checking auth...', 'color: yellow;');
     const checkAuth = () => {
       const token = localStorage.getItem('token');
       const role = localStorage.getItem('role');
-      console.log('%c   useEffect checkAuth: Found in localStorage:', 'color: yellow;', { token, role });
       if (token && role) {
-        console.log('%c   useEffect checkAuth: Setting state: Auth=true, Role=', role, 'color: yellow;');
         setIsAuthenticated(true);
         setUserRole(role);
       } else {
-        console.log('%c   useEffect checkAuth: No token/role found, ensuring logged out state.', 'color: yellow;');
         setIsAuthenticated(false);
         setUserRole('');
       }
-      console.log('%c   useEffect checkAuth: Setting authLoading=false', 'color: yellow;');
       setAuthLoading(false);
     };
-
     checkAuth();
   }, []);
 
   const AppRoutes = () => {
     const navigate = useNavigate();
 
-    const ProtectedRoute = ({ children, allowedRole }) => {
-      console.log(
-        `%c ProtectedRoute Check: Path=${window.location.pathname}, AllowedRole='${allowedRole}', AppState: Auth=${isAuthenticated}, Role='${userRole}', Loading=${authLoading}`,
-        'color: cyan; font-weight: bold;'
-      );
-
-      if (authLoading) {
-        console.log('%c   ProtectedRoute: Still loading auth state. Rendering null.', 'color: cyan;');
-        return null;
-      }
-
-      if (!isAuthenticated) {
-         console.log('%c   ProtectedRoute: Not Authenticated! Redirecting to / (from ProtectedRoute)', 'color: red; font-weight: bold;');
-         return <Navigate to="/" replace />;
-      }
-
-      if (allowedRole && userRole !== allowedRole) {
-          console.log(`%c   ProtectedRoute: Role Mismatch! UserRole='${userRole}', AllowedRole='${allowedRole}'. Redirecting to / (from ProtectedRoute)`, 'color: red; font-weight: bold;');
-          return <Navigate to="/" replace />;
-      }
-
-      console.log('%c   ProtectedRoute: Access Granted. Rendering children.', 'color: limegreen; font-weight: bold;');
-      return children;
-    };
-
     const handleLogout = () => {
-      console.log('%c handleLogout: Clearing localStorage and resetting state...', 'color: magenta;');
       localStorage.clear();
       setIsAuthenticated(false);
       setUserRole('');
       navigate('/');
     };
 
-    console.log(`%c AppRoutes Render Check: Auth=${isAuthenticated}, Role='${userRole}', Loading=${authLoading}`, 'color: lightblue;');
+    const ProtectedRoute = ({ children, allowedRole }) => {
+      if (authLoading) {
+        return null;
+      }
+      if (!isAuthenticated) {
+         return <Navigate to="/" replace />;
+      }
+      if (allowedRole && userRole !== allowedRole) {
+          let homePath = "/";
+          if (userRole === 'admin') homePath = '/admin';
+          else if (userRole === 'teacher') homePath = '/teacher';
+          else if (userRole === 'student') homePath = '/student';
+          return <Navigate to={homePath} replace />;
+      }
+      return children;
+    };
 
     return (
         <>
-            <header className="app-header">
-              <h1>EduQuiz</h1>
-              {isAuthenticated && !authLoading ? (
-                <nav className="app-nav">
-                  <button onClick={handleLogout}>Logout</button>
-                </nav>
-              ) : null}
-            </header>
-
-            {authLoading ? (
-                <p>Loading Application...</p>
-            ) : (
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      !isAuthenticated ? (
-                        <Login setAuth={setIsAuthenticated} setRole={setUserRole} />
-                      ) : userRole === 'student' ? (
-                        // If already on /student, let the /student route handle it.
-                        // If on /, navigate to /student.
-                        window.location.pathname === '/student' ? (
-                            <ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>
+            <Navbar 
+                isAuthenticated={isAuthenticated} 
+                userRole={userRole} 
+                handleLogout={handleLogout} 
+            />
+            <main className="app-content">
+              {authLoading ? (
+                  <div className="loading-container"><p>Loading Application...</p></div>
+              ) : (
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={
+                        !isAuthenticated ? (
+                          <Login setAuth={setIsAuthenticated} setRole={setUserRole} />
+                        ) : userRole === 'student' ? (
+                          <Navigate to="/student" replace />
+                        ) : userRole === 'admin' ? (
+                          <Navigate to="/admin" replace />
+                        ) : userRole === 'teacher' ? (
+                          <Navigate to="/teacher" replace />
                         ) : (
-                            <Navigate to="/student" replace />
+                          <>
+                            <p>Authenticated, but role ('{userRole}') is unknown. Logging out.</p>
+                            {(() => { handleLogout(); return null; })()}
+                          </>
                         )
-                      ) : userRole === 'admin' ? (
-                        window.location.pathname === '/admin' ? (
-                            <ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>
-                        ) : (
-                            <Navigate to="/admin" replace />
-                        )
-                      ) : userRole === 'teacher' ? (
-                        window.location.pathname === '/teacher' ? (
-                            <ProtectedRoute allowedRole="teacher"><TeacherDashboard /></ProtectedRoute>
-                        ) : (
-                            <Navigate to="/teacher" replace />
-                        )
-                      ) : (
-                        // Fallback if authenticated but role unknown or not on a dashboard path yet
-                        // This could also be a redirect to login if role is truly unexpected
-                        <>
-                          <p>Authenticated, but role ('{userRole}') is unknown or no dashboard path matched for current path: {window.location.pathname}.</p>
-                          <p>Consider redirecting to login or an error page.</p>
-                        </>
-                      )
-                    }
-                  />
+                      }
+                    />
 
-                  {/* Specific Protected Routes */}
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute allowedRole="admin">
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/teacher"
-                    element={
-                      <ProtectedRoute allowedRole="teacher">
-                        <TeacherDashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/student"
-                    element={
-                      <ProtectedRoute allowedRole="student">
-                        <StudentDashboard /> {/* Use the simplified version for this test */}
-                      </ProtectedRoute>
-                    }
-                  />
+                    {/* === ADMIN ROUTES === */}
+                    <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><AdminOverviewDashboard /></ProtectedRoute>} />
+                    <Route path="/admin/users" element={<ProtectedRoute allowedRole="admin"><ManageUsersPage /></ProtectedRoute>} />
+                    <Route path="/admin/users/create" element={<ProtectedRoute allowedRole="admin"><CreateUserPage /></ProtectedRoute>} />
+                    <Route path="/admin/classrooms" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} /> 
+                    <Route path="/admin/quizzes" element={<ProtectedRoute allowedRole="admin"><div>Quiz Monitor Page (Admin) - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/admin/reports" element={<ProtectedRoute allowedRole="admin"><div>Reports & Analytics Page (Admin) - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/admin/settings" element={<ProtectedRoute allowedRole="admin"><div>Settings Page (Admin) - Coming Soon</div></ProtectedRoute>} />
 
-                  {/* Quiz Route */}
-                  <Route
-  path="/quiz/:quizId"
-  element={
-    <ProtectedRoute> {/* Allow any authenticated user for now */}
-      <QuizAttempt />
-    </ProtectedRoute>
-  }
-/>
+                    {/* === TEACHER ROUTES === */}
+                    <Route path="/teacher" element={<ProtectedRoute allowedRole="teacher"><TeacherOverviewDashboard /></ProtectedRoute>} />
+                    <Route path="/teacher/classrooms" element={<ProtectedRoute allowedRole="teacher"><MyClassroomsPage /></ProtectedRoute>} />
+                    <Route path="/teacher/create-quiz" element={<ProtectedRoute allowedRole="teacher"><CreateQuizPageTeacher /></ProtectedRoute>} />
+                    <Route path="/teacher/quiz-library" element={<ProtectedRoute allowedRole="teacher"><QuizLibraryPage /></ProtectedRoute>} />
+                    <Route path="/teacher/student-performance" element={<ProtectedRoute allowedRole="teacher"><div>Student Performance Page (Teacher) - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/teacher/notifications" element={<ProtectedRoute allowedRole="teacher"><div>Notifications Page (Teacher) - Coming Soon</div></ProtectedRoute>} />
+                    
+                    {/* === STUDENT ROUTES (Updated) === */}
+                    <Route path="/student" element={<ProtectedRoute allowedRole="student"><StudentOverviewDashboard /></ProtectedRoute>} />
+                    <Route path="/student/quizzes" element={<ProtectedRoute allowedRole="student"><AvailableQuizzesPage /></ProtectedRoute>} /> {/* "Take Quiz" link could point here */}
+                    <Route path="/student/results" element={<ProtectedRoute allowedRole="student"><MyResultsPage /></ProtectedRoute>} />
+                    {/* Placeholder routes for other Student Navbar links */}
+                    <Route path="/student/upcoming" element={<ProtectedRoute allowedRole="student"><div>Upcoming Quizzes Page (Student) - Coming Soon</div></ProtectedRoute>} />
+                    <Route path="/student/profile" element={<ProtectedRoute allowedRole="student"><div>My Profile Page (Student) - Coming Soon</div></ProtectedRoute>} />
+                    
+                    <Route path="/quiz/:quizId" element={<ProtectedRoute><QuizAttempt /></ProtectedRoute>} />
+                    <Route path="/help" element={<ProtectedRoute><div>Help / FAQ Page - Coming Soon</div></ProtectedRoute>} />
 
-                  {/* Catch-all 404 */}
-                  <Route path="*" element={<p>Page Not Found (404) - from catch-all</p>} />
-                </Routes>
-            )}
+                    <Route path="*" element={
+                        <div><h2>Page Not Found (404)</h2><p>The page you are looking for does not exist.</p><Link to="/">Go to Homepage</Link></div>
+                    } />
+                  </Routes>
+              )}
+            </main>
         </>
     );
   };
 
-  return (
-    <Router>
-       <div className="App">
-         <AppRoutes />
-       </div>
-    </Router>
-  );
+  return ( <Router><div className="App"><AppRoutes /></div></Router> );
 }
-
 export default App;
+

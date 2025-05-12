@@ -1,121 +1,165 @@
 /* Eduquizz/src/frontend/src/pages/student/QuizAttempt.css */
+
 .quiz-attempt-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-  }
-  
-  .quiz-header h2 {
-    text-align: center;
-    margin-bottom: 5px;
-  }
-  .quiz-header p {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #555;
-  }
-  
-  .question-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid #eee;
-    border-radius: 5px;
-  }
-  
-  .question-text {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-  }
-  
-  .options-list .option-item {
-    margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .options-list .option-item:hover {
-      background-color: #e9e9e9;
-  }
-  .options-list .option-item input[type="radio"] {
-    margin-right: 10px;
-  }
-  .options-list .option-item label {
-      cursor: pointer;
-  }
-  
-  
-  .quiz-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
-  .btn {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-  }
-  .btn-primary { background-color: #007bff; color: white; }
-  .btn-secondary { background-color: #6c757d; color: white; }
-  .btn-success { background-color: #28a745; color: white; }
-  .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-  
-  .loading, .error-message { text-align: center; padding: 20px; font-size: 1.2em; }
-  .error-message { color: red; }
-  
-  .quiz-results { text-align: center; }
-  .quiz-results h2 { margin-bottom: 15px; }
-  .quiz-results h3 { margin-bottom: 20px; }
+  max-width: 750px; /* Slightly narrower for focus */
+  margin: 2rem auto; /* More vertical margin */
+  padding: 2rem;    /* More padding inside the main container */
+  background-color: #FFFFFF; /* White background for the quiz area */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.quiz-header h2 { /* Quiz Title */
+  color: #3B82F6; /* Primary - Royal Blue */
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 1.75em;
+}
+.quiz-header p { /* "Question X of Y" */
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #6B7280; /* Muted Gray */
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.question-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #F9FAFB; /* Soft Light Gray for question block, contrasting with white container */
+  border: 1px solid #E5E7EB; /* Light Gray border */
+  border-radius: 6px;
+}
+
+.question-text {
+  font-size: 1.25em; /* Larger font for question */
+  color: #111827; /* Dark Slate */
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.options-list .option-item {
+  background-color: #FFFFFF; /* White background for each option */
+  margin-bottom: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB; /* Slightly darker border for options */
+  display: flex; /* Align radio button and label */
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.options-list .option-item:hover {
+  border-color: #A5B4FC; /* Lighter blue on hover */
+  background-color: #EFF6FF; /* Very light blue background on hover */
+}
+.options-list .option-item input[type="radio"] {
+  margin-right: 0.75rem;
+  /* Custom radio button styling can be complex, relying on browser defaults for now */
+  /* Or use a library for custom radios */
+  transform: scale(1.2); /* Slightly larger radio buttons */
+}
+.options-list .option-item label {
+  cursor: pointer;
+  color: #1F2937; /* Softer dark slate for option text */
+  flex-grow: 1; /* Ensure label takes up space to make whole item clickable */
+}
+/* Style for selected option (optional, if you want to highlight it beyond radio check) */
+.options-list .option-item input[type="radio"]:checked + label {
+  font-weight: 600;
+  color: #3B82F6; /* Primary - Royal Blue for selected option text */
+}
 
 
-.quiz-results h4 {
-    margin-top: 25px;
-    margin-bottom: 10px;
-    text-align: left;
+.quiz-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #E5E7EB; /* Separator line */
+}
+/* Buttons will use .btn, .btn-primary, .btn-secondary, .btn-success from App.css */
+.quiz-navigation .btn {
+  padding: 0.6rem 1.2rem; /* Slightly adjusted padding */
+  font-size: 0.95em;
+}
+
+
+/* --- Results Display Styling --- */
+.quiz-results {
+  text-align: center;
+}
+.quiz-results h2 { /* "Quiz Submitted!" */
+  color: #10B981; /* Secondary - Emerald Green for success title */
+  font-size: 1.8em;
+  margin-bottom: 0.75rem;
+}
+.quiz-results h3 { /* "Your Score: X / Y" */
+  color: #111827; /* Dark Slate */
+  font-size: 1.4em;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+.quiz-results h4 { /* "Detailed Results:" */
+  color: #3B82F6; /* Primary - Royal Blue */
+  font-size: 1.2em;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  text-align: left; /* Align "Detailed Results" to the left */
+  border-bottom: 1px solid #DBEAFE;
+  padding-bottom: 0.5rem;
 }
 
 .detailed-results-list {
-    list-style-type: none;
-    padding: 0;
-    text-align: left;
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
 }
-
 .result-item {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+  background-color: #FFFFFF; /* White background for each result item */
+  border: 1px solid #E5E7EB; /* Light Gray border */
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
 }
-
 .result-item.correct {
-    border-left: 5px solid #28a745; /* Green for correct */
+  border-left: 5px solid #10B981; /* Secondary - Emerald Green */
+  background-color: #F0FDF4; /* Very light green */
 }
-
 .result-item.incorrect {
-    border-left: 5px solid #dc3545; /* Red for incorrect */
+  border-left: 5px solid #EF4444; /* Error/Warning - Soft Red */
+  background-color: #FEF2F2; /* Very light red */
 }
-
 .result-item p {
-    margin: 5px 0;
+  margin: 0.3rem 0;
+  color: #1F2937; /* Softer dark slate */
+}
+.result-item p strong { /* "Question X:" */
+  color: #111827; /* Dark Slate */
+}
+.incorrect-answer-text { /* "Your Answer: ..." when incorrect */
+  color: #B91C1C; /* Darker Red */
+  font-weight: 500;
+}
+.correct-answer-text { /* "Correct Answer: ..." or "✓ Correct" */
+  color: #047857; /* Darker Green */
+  font-weight: 500;
+}
+.btn-back-dashboard { /* Uses .btn .btn-primary from App.css */
+  margin-top: 2rem;
 }
 
-.incorrect-answer-text {
-    color: #dc3545;
-    font-weight: bold;
-}
 
-.correct-answer-text {
-    color: #28a745;
-    font-weight: bold;
+/* Loading and Error States */
+.quiz-attempt-container.loading,
+.quiz-attempt-container.error-message { /* If these classes are on the main container */
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1.2em;
 }
-
-.btn-back-dashboard {
-    margin-top: 20px;
+.quiz-attempt-container.error-message {
+  color: #EF4444; /* Error/Warning - Soft Red */
+  background-color: #FEF2F2; /* Light red background */
+  border: 1px solid #FCA5A5;
 }

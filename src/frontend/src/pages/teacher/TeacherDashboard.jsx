@@ -160,12 +160,11 @@ function TeacherDashboard() {
       })),
     };
     try {
-      let response;
       if (isEditingQuiz && quizForm._id) {
-        response = await axios.put(`/api/quizzes/${quizForm._id}`, quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
+        await axios.put(`/api/quizzes/${quizForm._id}`, quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
         setGeneralModalMessage("Quiz updated successfully!");
       } else {
-        response = await axios.post('/api/quizzes/create', quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
+        await axios.post('/api/quizzes/create', quizPayload, { headers: { 'Authorization': `Bearer ${token}` } });
         setGeneralModalMessage("Quiz created successfully!");
       }
       setShowGeneralModal(true); resetQuizForm(); fetchTeacherQuizzes();

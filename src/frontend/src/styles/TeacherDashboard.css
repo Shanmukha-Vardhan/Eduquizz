@@ -1,288 +1,194 @@
 /* Eduquizz/src/frontend/src/styles/TeacherDashboard.css */
 
 .teacher-dashboard-container {
-    padding: 20px;
-    font-family: sans-serif;
-  }
-  
-  .dashboard-header {
-    background-color: #006400; 
-    color: white;
-    padding: 15px 20px;
-    text-align: center;
-    margin-bottom: 20px;
-    border-radius: 5px;
-  }
-  
-  .dashboard-header h1 {
-    margin: 0;
-    font-size: 1.8em;
-  }
-  
-  .dashboard-content {
-    display: grid;
-    grid-template-columns: 1fr; 
-    gap: 20px;
-  }
-  
-  .card {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card h2 {
-    margin-top: 0;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .card h3 {
-      margin-top: 0;
-      color: #444;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-  }
-  
-  .form-group input[type="text"],
-  .form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; 
-  }
-  
-  .btn {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-    margin-right: 10px;
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
-  }
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-  }
-  .btn-secondary:hover {
-    background-color: #545b62;
-  }
-  
-  
-  .classrooms-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .classroom-item {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 4px;
-  }
-  
-  .question-editor {
-    border: 1px dashed #ccc;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    background-color: #fff;
-  }
-  .question-editor h4 {
-      margin-top: 0;
-  }
-  
-  .quiz-actions {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-  }
-  
-  
-  .error-message {
-    color: #D8000C;
-    background-color: #FFD2D2;
-    border: 1px solid #D8000C;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-  }
-  
-  
-  .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px 30px;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    min-width: 300px;
-  }
-  
-  .modal-content p {
-      margin-bottom: 20px;
-  }
-  
-  .modal-content button {
-      padding: 8px 20px;
-  }
-
-  
-
-.modal-backdrop.results-modal-backdrop {
- 
+  /* .app-content in App.css provides base padding and max-width */
 }
 
-.modal-content.results-modal-content {
-    width: 80%; 
-    max-width: 900px;
-    max-height: 80vh;
-    overflow-y: auto; 
+.dashboard-header h1 { /* Main "Teacher Dashboard" title */
+  color: #111827; /* Text - Dark Slate */
+  font-size: 2em;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-.results-modal-content h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+/* --- Card Styling (Now White, similar to Student Dashboard) --- */
+.teacher-dashboard-container .card {
+  background-color: #FFFFFF; /* White background for cards */
+  border: 1px solid #E5E7EB; /* Light Gray border (same as global .card) */
+  border-radius: 8px; /* Consistent with global .card if you used 0.5rem there */
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07); /* Consistent subtle shadow */
 }
 
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 0.9em;
+.teacher-dashboard-container .card h2 { /* Section titles within cards */
+  color: #3B82F6; /* Primary - Royal Blue for section titles */
+  font-size: 1.5em;
+  border-bottom: 2px solid #DBEAFE; /* A very light blue underline */
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.results-table th,
-.results-table td {
-    border: 1px solid #ddd;
-    padding: 8px 10px;
-    text-align: left;
+/* Assigned Classrooms Section */
+.assigned-classrooms-section .classrooms-list {
+  list-style: none;
+  padding: 0;
 }
-
-.results-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+.assigned-classrooms-section .classroom-item {
+  background-color: #F9FAFB; /* Soft Light Gray - for items inside white card */
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  border: 1px solid #E5E7EB; /* Light gray border */
 }
-
-.results-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+.classroom-item strong { /* Classroom name */
+  color: #1E3A8A; /* A darker, richer blue for emphasis on light backgrounds */
+  display: block;
+  margin-bottom: 0.5rem;
 }
-
-.modal-close-btn {
-    margin-top: 20px;
-    float: right; 
+.enrolled-students strong { /* "Students (X):" label */
+  color: #111827; /* Dark Slate */
+  font-size: 0.9em;
+}
+.enrolled-students ul {
+  list-style: disc;
+  margin-left: 20px;
+  padding-left: 0;
+  font-size: 0.9em;
+}
+.enrolled-students .student-item {
+  color: #1F2937; /* Slightly softer dark slate */
+  margin-bottom: 0.25rem;
+}
+.enrolled-students p small { 
+  color: #6B7280; /* Muted gray */
 }
 
 
+/* Quiz Creation/Editing Form Section */
+.quiz-creation-section .form-group {
+  margin-bottom: 1rem;
+}
+.quiz-creation-section .form-group label {
+  color: #111827; /* Dark Slate for labels on white card */
+  font-weight: 600;
+}
+/* Inputs will inherit from App.css (white bg, light border, blue focus) */
+
+.question-editor {
+  background-color: #F9FAFB; /* Soft Light Gray for each question block within white card */
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #E5E7EB; /* Light gray border */
+}
+.question-editor h4 {
+  color: #1E3A8A; /* Darker, richer blue for "Question X" title */
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.remove-question-btn { 
+  padding: 0.2rem 0.5rem !important; 
+  font-size: 0.8em !important;
+  line-height: 1 !important;
+}
+
+.quiz-form-actions, .quiz-actions { 
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem; 
+  justify-content: flex-start; 
+}
+
+
+/* Quiz Listing Section */
+.quiz-list-section .quiz-list {
+  list-style: none;
+  padding: 0;
+}
 .quiz-list .quiz-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+  background-color: #F9FAFB; /* Soft Light Gray for items on white card */
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  border: 1px solid #E5E7EB; /* Light gray border */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.quiz-list .quiz-item:last-child {
-    border-bottom: none;
-}
-
-.quiz-details {
-    flex-grow: 1;
-}
-.quiz-details strong {
-    display: block;
-    font-size: 1.1em;
-    margin-bottom: 3px;
+.quiz-details strong { /* Quiz title */
+  color: #1E3A8A; /* Darker, richer blue */
+  font-size: 1.1em;
+  display: block;
 }
 .quiz-details small {
-    display: block;
-    color: #555;
-    font-size: 0.85em;
+  font-size: 0.85em;
+  color: #4B5563; /* Muted gray */
+  display: block;
+  margin-top: 0.25rem;
 }
-
 .quiz-item-actions button {
-    margin-left: 10px;
-}
-
-.btn-info {
-    background-color: #17a2b8;
-    color: white;
-}
-.btn-small {
-    padding: 5px 10px;
-    font-size: 0.85em;
+  margin-left: 0.5rem;
 }
 
 
-.confirm-delete-modal-content p {
-    margin-bottom: 10px;
+/* Results Modal Styling */
+.results-modal-content { 
+  max-width: 800px; 
 }
-.confirm-delete-modal-content p small {
-    color: #555;
-    display: block;
-    margin-top: 5px;
+.results-table th {
+  background-color: #F3F4F6; /* A very light gray for table headers */
+  color: #111827; /* Dark Slate text */
+}
+.results-table .btn-warning.btn-extra-small { 
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8em;
+    line-height: 1.2;
+}
+
+
+/* Confirm Delete Modal */
+.confirm-delete-modal-content { 
+    max-width: 450px;
 }
 .confirm-delete-modal-content .modal-actions {
-    margin-top: 20px;
+    margin-top: 1.5rem;
     display: flex;
-    justify-content: flex-end; 
-}
-.confirm-delete-modal-content .modal-actions button {
-    margin-left: 10px;
-}
-.btn-danger {
-    background-color: #dc3545;
-    color: white;
+    justify-content: flex-end;
+    gap: 0.75rem;
 }
 
+/* General error messages within cards */
+.teacher-dashboard-container .card .error-message {
+    /* Inherits from App.css */
+}
+.teacher-dashboard-container .card p { 
+    color: #6B7280; /* Muted gray */
+}
 
-.btn-warning { 
-  background-color: #ffc107;
-  color: #212529;
+/* Ensure button styles from App.css are applied correctly */
+/* e.g., .btn, .btn-primary, .btn-info, .btn-warning, .btn-danger, .btn-small */
+
+
+/* Eduquizz/src/frontend/src/styles/TeacherDashboard.css */
+.dashboard-header {
+  background-color: #FFFFFF; /* White */
+  padding: 1rem; /* Optional padding */
+  margin-bottom: 1.5rem;
+  border-radius: 8px; /* Optional */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Optional subtle shadow */
+  text-align: center;
 }
-.btn-extra-small {
-  padding: 3px 8px;
-  font-size: 0.8em;
-  line-height: 1.2;
-}
-.results-table td button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+
+.dashboard-header h1 {
+  color: #111827; /* Dark Slate */
+  font-size: 2em;
+  margin: 0; /* Remove h1 margin if parent has padding */
 }

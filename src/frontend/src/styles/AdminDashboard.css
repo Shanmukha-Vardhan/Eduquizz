@@ -1,275 +1,168 @@
 /* Eduquizz/src/frontend/src/styles/AdminDashboard.css */
 
 .admin-dashboard-container {
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f4f7f6; /* Light background for the page */
+  /* .app-content in App.css provides base padding and max-width */
 }
 
-.dashboard-header {
-  background-color: #4a5568; /* Dark Grayish Blue */
-  color: white;
-  padding: 15px 25px;
-  text-align: center;
-  margin-bottom: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* --- Dashboard Header Styling (Consistent with other dashboards) --- */
+.admin-dashboard-container .dashboard-header { /* Assuming AdminDashboard.jsx uses this class */
+  padding-top: 1rem; 
+  margin-bottom: 1.5rem; 
+  text-align: center; 
 }
 
-.dashboard-header h1 {
-  margin: 0;
-  font-size: 1.8em;
-  font-weight: 500;
+.admin-dashboard-container .dashboard-header h1 {
+  color: #111827; /* Text - Dark Slate */
+  font-size: 2em;   
+  margin: 0; 
+}
+/* --- END Dashboard Header Styling --- */
+
+
+/* --- Card Styling (White) --- */
+.admin-dashboard-container .card {
+  background-color: #FFFFFF; 
+  border: 1px solid #E5E7EB; 
+  border-radius: 8px; 
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07); 
 }
 
-.dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr; /* Start with single column */
-  gap: 30px; /* Increased gap */
-}
-
-/* Style for each major section */
-.card {
-  background-color: #ffffff; /* White background for cards */
-  border: 1px solid #e2e8f0; /* Lighter border */
-  border-radius: 8px;
-  padding: 25px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.card h2 {
-  margin-top: 0;
-  color: #2d3748; /* Darker heading */
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
+.admin-dashboard-container .card h2 { /* Section titles like "Create New User" */
+  color: #3B82F6; /* Primary - Royal Blue */
   font-size: 1.5em;
+  border-bottom: 2px solid #DBEAFE; /* Very light blue underline */
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem; 
+}
+
+.admin-dashboard-container .card h3 { /* Sub-section titles like "Teachers", "Existing Classrooms" */
+  color: #1E3A8A; /* Darker, richer blue */
+  font-size: 1.25em;
+  margin-top: 1rem; 
+  margin-bottom: 0.75rem;
+}
+
+
+/* User Creation Section & Create Classroom Form */
+.create-user-form .form-group, /* Assuming these classes are used in AdminDashboard.jsx */
+.create-classroom-form .form-group {
+  margin-bottom: 1rem;
+}
+.create-user-form .form-group label,
+.create-classroom-form .form-group label {
+  color: #111827; /* Dark Slate for labels */
   font-weight: 600;
 }
-
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #4a5568;
-    font-size: 1.2em;
-    font-weight: 500;
-}
-
-/* Form Styling */
-.create-user-form .form-group,
-.create-classroom-form .form-group {
-  margin-bottom: 18px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600; /* Bolder labels */
-  color: #4a5568;
-  font-size: 0.95em;
-}
-/* Smaller label for inline actions */
-.form-group label.small-label {
-    font-size: 0.85em;
-    margin-bottom: 4px;
-    font-weight: 500;
+/* Inputs will inherit from App.css (white bg, light border, blue focus) */
+/* Buttons will use .btn, .btn-primary from App.css */
+.create-user-form button[type="submit"],
+.create-classroom-form button[type="submit"] {
+  margin-top: 0.5rem; 
 }
 
 
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e0; /* Slightly darker border */
-  border-radius: 6px;
-  box-sizing: border-box;
-  font-size: 1em;
-  transition: border-color 0.2s ease-in-out;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #4299e1; /* Blue border on focus */
-  box-shadow: 0 0 0 1px #4299e1;
-}
-
-/* Button Styling */
-.btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: 500;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease;
-  display: inline-block;
-  text-align: center;
-  margin-top: 5px; /* Add some top margin for buttons */
-  margin-right: 10px;
-}
-.btn:last-child {
-    margin-right: 0;
-}
-
-.btn-primary {
-  background-color: #4299e1; /* Blue */
-  color: white;
-}
-.btn-primary:hover {
-  background-color: #2b6cb0; /* Darker Blue */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.btn-secondary {
-  background-color: #718096; /* Gray */
-  color: white;
-}
-.btn-secondary:hover {
-  background-color: #4a5568; /* Darker Gray */
-}
-
-.btn-small { /* For action buttons in lists */
-    padding: 5px 10px;
-    font-size: 0.85em;
-    margin-left: 8px; /* Space between input/select and button */
-}
-
-
-/* User Lists Styling */
+/* User Lists Section */
 .user-lists-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 25px;
+  /* Optional: if you want side-by-side teacher/student lists */
+  /* display: flex; */
+  /* gap: 1.5rem; */
 }
-
-.teacher-list ul, .student-list ul {
-  list-style-type: none;
+.user-lists-section .teacher-list,
+.user-lists-section .student-list {
+  /* flex: 1; /* If using flex for side-by-side */
+  background-color: #F9FAFB; /* Soft Light Gray for list backgrounds within white card */
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #E5E7EB;
+  margin-bottom: 1rem; /* If stacked */
+}
+.user-lists-section ul {
+  list-style: none;
   padding: 0;
   margin: 0;
 }
-
-.teacher-list li, .student-list li {
-  background-color: #edf2f7;
-  border: 1px solid #e2e8f0;
-  padding: 10px 15px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  font-size: 0.95em;
-  color: #2d3748;
+.user-lists-section li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #E5E7EB;
+  color: #1F2937; /* Softer dark slate */
 }
-
-/* Classroom List Styling */
-.classrooms-list-section {
-    margin-top: 30px; /* Space above the list */
-}
-.classrooms-list {
-    list-style-type: none;
-    padding: 0;
-}
-.classroom-item {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column; /* Stack info and actions */
-    gap: 15px; /* Space between info and actions */
-}
-
-.classroom-info strong {
-    font-size: 1.1em;
-    color: #1a202c;
-    display: block; /* Make name take full width */
-    margin-bottom: 5px;
-}
-.classroom-info small {
-    display: block;
-    font-size: 0.85em;
-    color: #718096;
-    margin-bottom: 3px;
-}
-
-.classroom-actions {
-    display: flex;
-    flex-wrap: wrap; /* Allow actions to wrap on small screens */
-    gap: 20px; /* Space between enroll and assign sections */
-    border-top: 1px solid #eee; /* Separator */
-    padding-top: 15px;
-}
-
-.enroll-section, .assign-teacher-section {
-    display: flex;
-    align-items: flex-end; /* Align items to bottom */
-    gap: 8px; /* Space between label/input/button */
-    flex-grow: 1; /* Allow sections to grow */
-}
-
-.enroll-section input, .assign-teacher-section select {
-    flex-grow: 1; /* Allow input/select to take available space */
-    /* Reset width from form-group */
-    width: auto;
-    min-width: 150px; /* Prevent becoming too small */
+.user-lists-section li:last-child {
+  border-bottom: none;
 }
 
 
-/* Error Message */
-.error-message {
-  color: #c53030; background-color: #fed7d7; border: 1px solid #f56565;
-  padding: 12px 15px; border-radius: 6px; margin-top: 10px; margin-bottom: 15px;
+/* Classroom Management Section - Existing Classrooms List */
+.classrooms-list-section ul.classrooms-list { /* Targeting the ul specifically */
+  list-style: none;
+  padding: 0;
+}
+.classrooms-list-section .classroom-item {
+  background-color: #F9FAFB; /* Soft Light Gray for items */
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #E5E7EB;
+}
+.classroom-item .classroom-info {
+  margin-bottom: 0.75rem;
+}
+.classroom-item .classroom-info strong { /* Classroom Name */
+  color: #1E3A8A; /* Darker, richer blue */
+  font-size: 1.15em;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.classroom-item .classroom-info small {
+  display: block;
+  font-size: 0.85em;
+  color: #4B5563; /* Muted gray */
+  margin-bottom: 0.2rem;
+}
+
+.classroom-item .classroom-actions {
+  border-top: 1px solid #DBEAFE; /* Very light blue separator */
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column; 
+  gap: 0.75rem; 
+}
+.classroom-actions .form-group { 
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0; 
+}
+.classroom-actions .form-group label.small-label { /* Ensure this class is used in JSX if needed */
+  font-size: 0.85em;
+  margin-bottom: 0;
+  white-space: nowrap; 
+}
+.classroom-actions .form-group input,
+.classroom-actions .form-group select {
+  flex-grow: 1; 
+  padding: 0.4rem 0.6rem; 
   font-size: 0.9em;
 }
-
-/* Modal Styles */
-.modal-backdrop {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); display: flex;
-  justify-content: center; align-items: center; z-index: 1000;
+/* .btn-small is defined in App.css or can be added here if specific */
+.classroom-actions .btn-small { 
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85em;
 }
-.modal-content {
-  background-color: white; padding: 25px 35px; border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); text-align: center;
-  min-width: 320px; max-width: 450px;
+.classroom-actions .delete-section {
+  margin-top: 0.5rem; 
+  align-self: flex-start; 
 }
-.modal-content p { margin-bottom: 20px; font-size: 1.1em; color: #333; }
-.modal-content button { padding: 10px 25px; }
+/* .btn-danger is defined in App.css */
 
-/* Eduquizz/src/frontend/src/styles/AdminDashboard.css */
 
-/* ... existing styles ... */
-
-.btn-danger {
-  background-color: #e53e3e; /* Red */
-  color: white;
+/* Modal styling will be inherited from App.css */
+/* Error messages will be inherited from App.css */
+.admin-dashboard-container .card .error-message {
+    /* Inherits from App.css */
 }
-.btn-danger:hover {
-  background-color: #c53030; /* Darker Red */
+.admin-dashboard-container .card p { /* For "No users found" etc. */
+    color: #6B7280; /* Muted gray */
 }
-
-.classroom-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-    align-items: flex-end; /* Align items vertically */
-}
-
-.assign-teacher-section, .enroll-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    flex-grow: 1;
-    min-width: 200px; /* Prevent sections from becoming too narrow */
-}
-
-.delete-section {
-    /* Aligns button nicely with others if needed, or just let it flow */
-    margin-left: auto; /* Pushes delete button to the right if space allows */
-    padding-top: 20px; /* Align with input labels roughly */
-}
-
-/* ... rest of existing styles ... */

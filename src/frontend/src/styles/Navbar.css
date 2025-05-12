@@ -1,0 +1,149 @@
+/* Eduquizz/src/frontend/src/styles/Navbar.css */
+
+.navbar-main {
+    background-color: #3B82F6; /* Primary - Royal Blue */
+    padding: 0.8rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #FFFFFF; 
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .navbar-logo {
+    color: #FFFFFF;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .navbar-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-menu li {
+    margin-left: 0.5rem; 
+  }
+  
+  /* --- Nav Links (Main Navigation) - WITH NEW GUMROAD-INSPIRED EFFECT --- */
+  .nav-link {
+    /* Variables for this specific link type's Gumroad effect */
+    --nav-link-bg: transparent; /* Base background */
+    --nav-link-hover-bg: rgba(255, 255, 255, 0.1); /* Subtle background on hover */
+    --nav-link-hover-text: #FFFFFF; /* Text color on hover */
+    --nav-link-shadow-color: #2563EB; /* A darker shade of Royal Blue for the shadow */
+    
+    color: #E0E7FF; /* Muted Slate Blue for links */
+    text-decoration: none;
+    padding: 0.6rem 0.9rem; 
+    border-radius: 4px;
+    font-size: 0.95em; 
+    background-color: var(--nav-link-bg);
+    border: 1px solid transparent; /* To prevent layout shift with box-shadow */
+    display: inline-block; /* For transform to work correctly */
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s;
+  }
+  
+  .nav-link:hover {
+    color: var(--nav-link-hover-text);
+    background-color: var(--nav-link-hover-bg);
+    transform: translate(-0.15rem, -0.15rem); /* Slightly less movement for nav links */
+    box-shadow: 0.15rem 0.15rem var(--nav-link-shadow-color);
+  }
+  
+  .nav-link:active { /* When clicked */
+    transform: translate(0);
+    box-shadow: none;
+  }
+  
+  .nav-link.active { /* For the currently active page route */
+    color: #FFFFFF; 
+    font-weight: bold;
+    /* You can choose to keep the hover effect for active, or make it distinct */
+    /* For example, to keep the "lifted" look on active, you could apply hover styles: */
+    /* transform: translate(-0.15rem, -0.15rem); */
+    /* box-shadow: 0.15rem 0.15rem var(--nav-link-shadow-color); */
+    /* background-color: var(--nav-link-hover-bg); */
+  
+    /* Or a simpler distinct active style: */
+     background-color: rgba(255, 255, 255, 0.2); 
+  }
+  
+  
+  /* --- General .nav-button class (if used by quick-action or other generic buttons) --- */
+  .nav-button { /* This class is used by quick-action and logout in Navbar.jsx */
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em; 
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    margin-left: 0.5rem; 
+  }
+  
+  /* --- Logout Button (Keeping your existing hover effect) --- */
+  .logout-btn {
+    background-color: #FBBF24; /* Accent - Amber/Warm Yellow */
+    color: #111827; /* Dark Slate for text on yellow */
+    /* Inherits padding, border-radius, cursor, font-size, transition, margin-left from .nav-button */
+  }
+  
+  .logout-btn:hover {
+    background-color: #F59E0B; /* Darker Amber */
+  }
+  
+  /* --- Quick Action Button (e.g., Create User, Add Question - Keeping your existing hover effect) --- */
+  .quick-action-btn {
+    background-color: transparent;
+    color: #E0E7FF; /* Muted Slate Blue */
+    border: 1px solid #A5B4FC; /* A slightly more visible border */
+    /* Inherits padding, border-radius, cursor, font-size, transition, margin-left from .nav-button */
+  }
+  
+  .quick-action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+  }
+  
+  
+  /* Basic Responsive (Hamburger Menu - to be implemented if needed) */
+  .navbar-toggle {
+    display: none;
+  }
+  
+  @media screen and (max-width: 992px) { 
+    .navbar-menu li {
+      margin-left: 0.2rem; 
+    }
+    .nav-link { /* This is the one with the new effect */
+      padding: 0.6rem 0.5rem; 
+      font-size: 0.9em;
+    }
+    .nav-button, .logout-btn, .quick-action-btn { /* Adjust all buttons */
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85em;
+    }
+    .navbar-logo {
+      font-size: 1.6em;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    /* Placeholder for hamburger menu logic */
+  }
