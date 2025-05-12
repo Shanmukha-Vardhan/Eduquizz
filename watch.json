@@ -1,18 +1,18 @@
 {
-    "install": "cd src/frontend && npm install && npm run build && cd ../../src/backend && npm install",
-    "start": "cd src/backend && node server.js",
+    "install": "npm run heroku-postbuild", 
+    "start": "npm start", 
     "watch": {
       "throttle": 1000,
       "ignore": [
         "\\.git",
         "node_modules/.*",
         "src/frontend/node_modules/.*",
-        "src/frontend/build/.*" 
+        "src/frontend/build/.*"
       ],
       "paths": [
         "src/backend/",
-        "src/frontend/src/" 
+        "src/frontend/src/"
       ]
     },
-    "node_version": "18" 
+    "node_version": "18"
   }
