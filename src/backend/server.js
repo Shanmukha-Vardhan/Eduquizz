@@ -1,9 +1,5 @@
-// Eduquizz/src/backend/server.js
+require('dotenv').config(); 
 
-// Load environment variables FIRST
-require('dotenv').config(); // Ensure .env is loaded if it's in this directory
-// If .env is in the root of the repo, and Glitch runs from root, this might need adjustment
-// or rely on Glitch's UI for .env vars. For now, assume .env is in src/backend/
 
 const express = require('express');
 const cors = require('cors');
@@ -53,42 +49,25 @@ console.log('--> User routes mounted successfully on /api/users');
 app.use('/api/submissions', submissionRoutes);
 console.log('--> Submission routes mounted successfully on /api/submissions');
 
-// --- Serve Static Frontend Assets (React Build) ---
-// This section is crucial for serving your built React app
-// It should come AFTER your API routes but BEFORE any catch-all for the root.
-
-// Determine the correct path to the frontend build directory
-// __dirname in this file (src/backend/server.js) refers to /app/src/backend on Glitch
-// We need to go up two levels to /app/, then into src/frontend/build/
 const frontendBuildPath = path.join(__dirname, '..', '..', 'src', 'frontend', 'build');
 console.log(`Serving static files from: ${frontendBuildPath}`);
 
 app.use(express.static(frontendBuildPath));
 
 // For any GET request that doesn't match an API route, serve the React app's index.html
-// This allows React Router to handle client-side navigation.
 app.get('*', (req, res) => {
-  // Ensure the path to index.html is correct
+
   const indexPath = path.join(frontendBuildPath, 'index.html');
   console.log(`Attempting to serve index.html from: ${indexPath}`);
   res.sendFile(indexPath, (err) => {
     if (err) {
-      // Log the error and send a 500 response if index.html can't be sent
+
       console.error('Error sending index.html:', err);
       res.status(500).send('Error serving application.');
     }
   });
 });
 
-
-// --- Root/Test Route for API (Optional, but good to have before static serving catch-all) ---
-// If you want a specific /api root message, it should be before the app.get('*') for static serving.
-// However, since /api/* is handled by your specific routers, a general app.get('/') for API status
-// might be caught by the static serving if not placed carefully or if you have an index.html at the root.
-// For simplicity, the static serving catch-all is often sufficient.
-// If you had app.get('/', ...) here, ensure it doesn't conflict with serving index.html.
-
-// --- Global Error Handlers (Good Practice) ---
 process.on('unhandledRejection', (reason, promise) => {
   console.error('****** UNHANDLED REJECTION ******');
   console.error('Reason:', reason);

@@ -1,20 +1,11 @@
-// Eduquizz/src/frontend/src/pages/admin/AdminDashboard.jsx
+// src/frontend/src/pages/admin/AdminDashboard.jsx
+
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Assuming you use axios for consistency
+import axios from 'axios';
 import '../../styles/AdminDashboard.css';
 
 function AdminDashboard() {
-  // --- State for User Management (REMOVED - Moved to ManageUsersPage & CreateUserPage) ---
-  // const [teachers, setTeachers] = useState([]); // REMOVED
-  // const [students, setStudents] = useState([]); // REMOVED
-  // const [isLoadingUsers, setIsLoadingUsers] = useState(true); // REMOVED
-  // const [userError, setUserError] = useState(null); // REMOVED
-  // const [newUserName, setNewUserName] = useState(''); // REMOVED
-  // const [newUserEmail, setNewUserEmail] = useState(''); // REMOVED
-  // const [newUserPassword, setNewUserPassword] = useState(''); // REMOVED
-  // const [newUserRole, setNewUserRole] = useState(''); // REMOVED
-
-  // --- State for Classroom Management (KEPT) ---
+  // --- State for Classroom Management ---
   const [classrooms, setClassrooms] = useState([]);
   const [isLoadingClassrooms, setIsLoadingClassrooms] = useState(true);
   const [classroomError, setClassroomError] = useState(null);
@@ -23,23 +14,20 @@ function AdminDashboard() {
   const [studentEmailToEnroll, setStudentEmailToEnroll] = useState({});
   const [teacherToAssign, setTeacherToAssign] = useState({});
   
-  // --- Teachers list for dropdowns (NEW - needed for classroom creation/assignment) ---
+  // --- State for Teachers list for dropdowns ---
   const [availableTeachers, setAvailableTeachers] = useState([]);
   const [isLoadingTeachersForSelect, setIsLoadingTeachersForSelect] = useState(true);
 
-
-  // --- Modal State (KEPT - for classroom actions) ---
+  // --- State for Modal ---
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
-  // --- Fetch Users Function (MODIFIED - to only fetch teachers for dropdowns) ---
+  // --- Fetch Teachers for Dropdowns ---
   const fetchTeachersForSelect = async () => {
     console.log("[AdminDashboard] Fetching teachers for select dropdowns...");
     setIsLoadingTeachersForSelect(true);
-    // Not setting userError here as it's classroom focused now
     const token = localStorage.getItem('token');
     if (!token) { 
-        // Handle error appropriately, maybe set a specific error for teacher fetching
         console.error("Admin token not found for fetching teachers.");
         setIsLoadingTeachersForSelect(false); 
         return; 
@@ -53,19 +41,22 @@ function AdminDashboard() {
     } catch (err) {
       console.error("[AdminDashboard] Error fetching teachers for select:", err);
       setAvailableTeachers([]);
-      // Set a specific error state if needed for this fetch
     } finally {
       setIsLoadingTeachersForSelect(false);
     }
   };
 
-
+  // --- Fetch Classrooms ---
   const fetchClassrooms = async () => {
     console.log("[AdminDashboard] Fetching classrooms...");
     setIsLoadingClassrooms(true);
     setClassroomError(null);
     const token = localStorage.getItem('token');
-    if (!token) { setClassroomError("Admin token not found."); setIsLoadingClassrooms(false); return; }
+    if (!token) { 
+        setClassroomError("Admin token not found."); 
+        setIsLoadingClassrooms(false); 
+        return; 
+    }
     try {
         const response = await axios.get('/api/classrooms', { headers: { 'Authorization': `Bearer ${token}` } });
         setClassrooms(Array.isArray(response.data) ? response.data : []);
@@ -77,87 +68,146 @@ function AdminDashboard() {
     }
   };
 
+  // --- Initial Data Fetch on Component Mount ---
   useEffect(() => {
-    // fetchUsers(); // REMOVED - User listing is on ManageUsersPage
-    fetchTeachersForSelect(); // Fetch teachers for dropdowns
+    fetchTeachersForSelect();
     fetchClassrooms();
   }, []);
 
-  // handleCreateUser function (REMOVED - Moved to CreateUserPage)
-
+  // --- Handler for Creating a New Classroom ---
   const handleCreateClassroom = async (e) => {
       e.preventDefault();
       setClassroomError(null);
       const token = localStorage.getItem('token');
       if (!token) { setClassroomError("Admin token not found."); return; }
       if (!newClassroomName.trim() || !selectedTeacherId) {
-          setModalMessage("Please enter a classroom name and select a teacher."); setShowModal(true); return;
+          setModalMessage("Please enter a classroom name and select a teacher."); 
+          setShowModal(true); 
+          return;
       }
       try {
-          const response = await axios.post('/api/classrooms/create', 
+          await axios.post('/api/classrooms/create', 
             { name: newClassroomName, teacherId: selectedTeacherId },
             { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } }
           );
-          setModalMessage("Classroom created successfully!"); setShowModal(true);
-          setNewClassroomName(''); setSelectedTeacherId('');
+          setModalMessage("Classroom created successfully!"); 
+          setShowModal(true);
+          setNewClassroomName(''); 
+          setSelectedTeacherId('');
           fetchClassrooms(); // Refresh classroom list
       } catch (err) {
           setClassroomError(err.response?.data?.error || err.message || "Failed to create classroom.");
-          setModalMessage(`Error: ${err.response?.data?.error || err.message}`); setShowModal(true);
+          setModalMessage(`Error: ${err.response?.data?.error || err.message}`); 
+          setShowModal(true);
       }
   };
 
+  // --- Handler for Enrolling a Student ---
   const handleEnrollStudent = async (classroomId) => {
       const studentEmail = studentEmailToEnroll[classroomId]?.trim();
       setClassroomError(null);
       const token = localStorage.getItem('token');
       if (!token) { setClassroomError("Admin token not found."); return; }
       if (!studentEmail) {
-          setModalMessage("Please enter the Student's Email to enroll."); setShowModal(true); return;
+          setModalMessage("Please enter the Student's Email to enroll."); 
+          setShowModal(true); 
+          return;
       }
       try {
           const response = await axios.post(`/api/classrooms/${classroomId}/enroll`, 
             { studentEmail: studentEmail },
             { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } }
           );
-          setModalMessage(response.data.message || "Student enrolled successfully!"); setShowModal(true);
+          setModalMessage(response.data.message || "Student enrolled successfully!"); 
+          setShowModal(true);
           setStudentEmailToEnroll(prev => ({ ...prev, [classroomId]: '' }));
           fetchClassrooms();
       } catch (err) {
           setClassroomError(err.response?.data?.error || err.message || "Failed to enroll student.");
-          setModalMessage(`Error: ${err.response?.data?.error || err.message}`); setShowModal(true);
+          setModalMessage(`Error: ${err.response?.data?.error || err.message}`); 
+          setShowModal(true);
       }
   };
 
-  const handleEnrollInputChange = (classroomId, value) => { /* ... (Kept) ... */ };
-  const handleAssignTeacher = async (classroomId) => { /* ... (Kept, ensure it uses availableTeachers for dropdown) ... */ };
-  const handleAssignTeacherChange = (classroomId, value) => { /* ... (Kept) ... */ };
-  const handleDeleteClassroom = async (classroomId, classroomName) => { /* ... (Kept) ... */ };
-  const closeModal = () => { setShowModal(false); setModalMessage(''); };
+  // --- Handler for Deleting a Classroom ---
+  const handleDeleteClassroom = async (classroomId, classroomName) => {
+    if (!window.confirm(`Are you sure you want to permanently delete the classroom "${classroomName}"? This cannot be undone.`)) {
+        return;
+    }
+    const token = localStorage.getItem('token');
+    if (!token) {
+        setClassroomError("Admin token not found.");
+        return;
+    }
+    try {
+        await axios.delete(`/api/classrooms/${classroomId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setModalMessage("Classroom deleted successfully!");
+        setShowModal(true);
+        fetchClassrooms(); // Refresh the list
+    } catch (err) {
+        setClassroomError(err.response?.data?.error || err.message || "Failed to delete classroom.");
+        setModalMessage(`Error: ${err.response?.data?.error || err.message}`);
+        setShowModal(true);
+    }
+  };
 
+  // --- Handler for Assigning a Teacher ---
+  const handleAssignTeacher = async (classroomId) => {
+    const teacherId = teacherToAssign[classroomId];
+    if (!teacherId) {
+        setModalMessage("No teacher selected to assign.");
+        setShowModal(true);
+        return;
+    }
+    const token = localStorage.getItem('token');
+    try {
+        await axios.put(`/api/classrooms/${classroomId}/assign-teacher`, 
+            { teacherId },
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        setModalMessage("Teacher assigned successfully!");
+        setShowModal(true);
+        fetchClassrooms(); // Refresh to show the new teacher
+        setTeacherToAssign(prev => ({ ...prev, [classroomId]: '' })); // Reset dropdown for this item
+    } catch (err) {
+        setModalMessage(`Error assigning teacher: ${err.response?.data?.error || err.message}`);
+        setShowModal(true);
+    }
+  };
+
+  // --- Input Change Handlers ---
+  const handleEnrollInputChange = (classroomId, value) => {
+    setStudentEmailToEnroll(prev => ({ ...prev, [classroomId]: value }));
+  };
+
+  const handleAssignTeacherChange = (classroomId, value) => {
+    setTeacherToAssign(prev => ({ ...prev, [classroomId]: value }));
+  };
+
+  const closeModal = () => { 
+      setShowModal(false); 
+      setModalMessage(''); 
+  };
 
   return (
     <div className="admin-dashboard-container">
-      {/* The main h1 for "Admin Dashboard" is now in AdminOverviewDashboard.jsx for the /admin route */}
-      {/* This component will be rendered by /admin/classrooms (or similar specific route) */}
-      {/* So, it should have its own specific title if needed, or rely on Navbar context */}
-      
-      {/* If this component is for a specific page like "/admin/classrooms-management", add a title */}
       <header className="dashboard-header">
           <h1>Classroom Management</h1> 
       </header>
 
-
-      {showModal && ( <div className="modal-backdrop"><div className="modal-content"><p>{modalMessage}</p><button onClick={closeModal} className="btn btn-primary">Close</button></div></div> )}
+      {showModal && ( 
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <p>{modalMessage}</p>
+            <button onClick={closeModal} className="btn btn-primary">Close</button>
+          </div>
+        </div> 
+      )}
 
       <div className="dashboard-content">
-        {/* User Creation Section (REMOVED - Moved to CreateUserPage) */}
-        {/* User Lists Section (REMOVED - Moved to ManageUsersPage) */}
-
-        {/* Classroom Management Section (KEPT) */}
         <section className="classroom-management-section card">
-            {/* Title can be more specific if this component is solely for classroom management */}
-            {/* <h2>Manage Classrooms</h2> */} 
             {classroomError && <p className="error-message">Classroom Operation Error: {classroomError}</p>}
             
             <div className="create-classroom-form">
